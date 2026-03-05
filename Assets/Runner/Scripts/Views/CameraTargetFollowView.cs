@@ -1,10 +1,11 @@
 using UnityEngine;
+using Zenject;
 
 public class CameraTargetFollowView : MonoBehaviour, ICameraRespawnSync
 {
     [SerializeField] private Transform _player;
     [SerializeField] private bool _followY;
-
+    
     private void LateUpdate()
     {
         Follow();

@@ -12,8 +12,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f0ef4d9f08950e49a80de42be272469, type: 3}
   m_Name: Config_RunnerGame
   m_EditorClassIdentifier: Assembly-CSharp::RunnerGameConfig
-  _startSpeed: 6
-  _speedIncreasePerSecond: 0.1
-  _warmupSeconds: 3
-  _laneOffsetX: 2
-  _laneChangeDurationSeconds: 0.12
+  <StartSpeed>k__BackingField: 6
+  <SpeedIncreasePerSecond>k__BackingField: 0.1
+  <MaxSpeed>k__BackingField: 16
+  <JumpDurationSeconds>k__BackingField: 0.6
+  <JumpHeightMeters>k__BackingField: 1.2
+  <JumpCurve>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  <SlideDurationSeconds>k__BackingField: 0.7
+  <WarmupSeconds>k__BackingField: 3
+  <LaneOffsetX>k__BackingField: 1.5
+  <LaneChangeDurationSeconds>k__BackingField: 0.12
+  <ScorePerMeter>k__BackingField: 1

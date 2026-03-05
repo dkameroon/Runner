@@ -1,24 +1,41 @@
 using UnityEngine;
+using Zenject;
 
 public class EditorRestartInputView : MonoBehaviour
 {
     private PlayerRespawnSystem _playerRespawnSystem;
+    private SpeedSystem _speedSystem;
+    private PlayerScoreSystem _playerScoreSystem;
+    private PlayerScoreUpdateView _playerScoreUpdateView;
+    private PlayerStateMachineSystem _playerStateMachineSystem;
 
-    public void Construct(PlayerRespawnSystem playerRespawnSystem)
+    [Inject]
+    public void Construct(
+        PlayerRespawnSystem playerRespawnSystem,
+        SpeedSystem speedSystem,
+        PlayerScoreSystem playerScoreSystem,
+        PlayerScoreUpdateView playerScoreUpdateView,
+        PlayerStateMachineSystem playerStateMachineSystem)
     {
         _playerRespawnSystem = playerRespawnSystem;
+        _speedSystem = speedSystem;
+        _playerScoreSystem = playerScoreSystem;
+        _playerScoreUpdateView = playerScoreUpdateView;
+        _playerStateMachineSystem = playerStateMachineSystem;
     }
 
     private void Update()
     {
-        if (_playerRespawnSystem == null)
-        {
+        if (!Input.GetKeyDown(KeyCode.R))
             return;
-        }
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            _playerRespawnSystem.Respawn();
-        }
+        _playerRespawnSystem.Respawn();
+
+        _playerScoreSystem.Reset();
+        _playerScoreUpdateView.ResetTracking();
+
+        _speedSystem.ResetSpeed();
+
+        _playerStateMachineSystem.SetRun();
     }
 }

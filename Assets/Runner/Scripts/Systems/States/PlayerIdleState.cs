@@ -1,0 +1,19 @@
+public class PlayerIdleState : IPlayerState
+{
+    public EPlayerState StateType => EPlayerState.Idle;
+
+    private readonly PlayerStateContextModel _context;
+
+    public PlayerIdleState(PlayerStateContextModel context)
+    {
+        _context = context;
+    }
+
+    public void Enter()
+    {
+        _context.PlayerView.SetMovementEnabled(false);
+    }
+
+    public void Exit() { }
+    public void Tick() { }
+}

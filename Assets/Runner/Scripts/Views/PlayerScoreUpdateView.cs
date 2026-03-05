@@ -1,14 +1,16 @@
 using UnityEngine;
+using Zenject;
 
 public class PlayerScoreUpdateView : MonoBehaviour
 {
     private PlayerScoreSystem _playerScoreSystem;
     private float _lastZPosition;
 
+    [Inject]
     public void Construct(PlayerScoreSystem playerScoreSystem)
     {
         _playerScoreSystem = playerScoreSystem;
-        _lastZPosition = transform.position.z;
+        ResetTracking();
     }
 
     public void ResetTracking()
@@ -18,16 +20,11 @@ public class PlayerScoreUpdateView : MonoBehaviour
 
     private void Update()
     {
-        if (_playerScoreSystem == null)
-        {
-            return;
-        }
+        float currentZPosition = transform.position.z;
+        float deltaMeters = currentZPosition - _lastZPosition;
 
-        float currentZ = transform.position.z;
-        float delta = currentZ - _lastZPosition;
+        _playerScoreSystem.AddDistance(deltaMeters);
 
-        _playerScoreSystem.UpdateScore(delta);
-
-        _lastZPosition = currentZ;
+        _lastZPosition = currentZPosition;
     }
 }
