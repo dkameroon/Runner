@@ -17,11 +17,16 @@ public class PlayerSlideState : IPlayerState
 
     public void Enter()
     {
+        _context.PlayerAnimatorView.TriggerSlide();
+        _context.PlayerHitboxView.ApplySlide();
         _context.PlayerView.DoSlide();
         _timeLeft = _context.RunnerGameConfig.SlideDurationSeconds;
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        _context.PlayerHitboxView.ApplyDefault();
+    }
 
     public void Tick()
     {

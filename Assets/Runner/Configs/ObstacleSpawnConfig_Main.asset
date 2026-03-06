@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be58031bf1b55be428c148f102a12f18, type: 3}
+  m_Name: ObstacleSpawnConfig_Main
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleSpawnConfig
+  <SpawnDistanceAhead>k__BackingField: 60
+  <MinDistanceBetweenObstacles>k__BackingField: 12
+  <DespawnDistanceBehindPlayer>k__BackingField: 15
+  <SpawnIntervalSeconds>k__BackingField: 1
+  <PrewarmCountPerType>k__BackingField: 5
+  <GroundY>k__BackingField: 0

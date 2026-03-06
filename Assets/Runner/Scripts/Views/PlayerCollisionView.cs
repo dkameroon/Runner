@@ -1,9 +1,10 @@
 using UnityEngine;
 using Zenject;
 
-[RequireComponent(typeof(Collider))]
 public class PlayerCollisionView : MonoBehaviour
 {
+    [SerializeField] private LayerMask _deathLayerMask;
+
     private PlayerStateMachineSystem _playerStateMachineSystem;
 
     [Inject]
@@ -14,7 +15,19 @@ public class PlayerCollisionView : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (_playerStateMachineSystem.CurrentStateType == EPlayerState.Dead)
+            return;
+
+        ObstacleView obstacleView = other.GetComponentInParent<ObstacleView>();
+        if (obstacleView == null)
+            return;
+
+        int layer = obstacleView.gameObject.layer;
+
+        int otherLayerBit = 1 << layer;
+        if ((_deathLayerMask.value & otherLayerBit) == 0)
+            return;
+
         _playerStateMachineSystem.SetDead();
-        
     }
 }

@@ -11,6 +11,8 @@ public class PlayerDeadState : IPlayerState
 
     public void Enter()
     {
+        _context.PlayerAnimatorView.SetRunning(false);
+        _context.PlayerAnimatorView.SetDead(true);
         _context.PlayerView.SetMovementEnabled(false);
     }
 

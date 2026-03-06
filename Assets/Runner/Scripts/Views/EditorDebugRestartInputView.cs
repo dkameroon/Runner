@@ -1,7 +1,7 @@
 using UnityEngine;
 using Zenject;
 
-public class EditorRestartInputView : MonoBehaviour
+public class EditorDebugRestartInputView : MonoBehaviour
 {
     private PlayerRespawnSystem _playerRespawnSystem;
     private SpeedSystem _speedSystem;

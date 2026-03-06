@@ -13,6 +13,7 @@ public class PlayerJumpState : IPlayerState
 
     public void Enter()
     {
+        _context.PlayerAnimatorView.TriggerJump();
         _context.PlayerView.JumpCompleted += OnJumpCompleted;
         _context.PlayerView.DoJump();
     }

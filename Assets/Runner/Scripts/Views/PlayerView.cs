@@ -98,8 +98,7 @@ public class PlayerView : MonoBehaviour, IMovementToggle, IRespawnable
     {
         if (!_isInitialized)
             return;
-
-        Debug.Log("Player: Slide");
+        
     }
 
     private void InitializeIfNeeded()
@@ -159,7 +158,7 @@ public class PlayerView : MonoBehaviour, IMovementToggle, IRespawnable
 
         float height = _runnerGameConfig.JumpHeightMeters;
 
-        float yOffset = height * 4f * t * (1f - t);
+        float yOffset = height * Mathf.Sin(Mathf.PI * t);
 
         Vector3 position = transform.position;
         position.y = _jumpBaseY + yOffset;
