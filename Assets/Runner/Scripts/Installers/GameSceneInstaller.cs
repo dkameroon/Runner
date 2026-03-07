@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using Zenject;
 
 public class GameSceneInstaller : MonoInstaller
@@ -6,10 +7,14 @@ public class GameSceneInstaller : MonoInstaller
     [SerializeField] private RunnerGameConfig _runnerGameConfig;
     [SerializeField] private ObstacleSpawnConfig _obstacleSpawnConfig;
     [SerializeField] private ObstaclePrefabsConfig _obstaclePrefabsConfig;
+    [SerializeField] private WorldGenerationConfig _worldGenerationConfig;
 
     public override void InstallBindings()
     {
         Container.BindInstance(_runnerGameConfig).AsSingle();
+        Container.BindInstance(_obstacleSpawnConfig).AsSingle();
+        Container.BindInstance(_obstaclePrefabsConfig).AsSingle();
+        Container.BindInstance(_worldGenerationConfig).AsSingle();
         
         Container.Bind<PlayerView>().FromComponentInHierarchy().AsSingle().NonLazy();
         Container.Bind<PlayerCollisionView>().FromComponentInHierarchy().AsSingle().NonLazy();
@@ -19,16 +24,16 @@ public class GameSceneInstaller : MonoInstaller
         Container.Bind<PlayerAnimatorView>().FromComponentInHierarchy().AsSingle().NonLazy();
         
         Container.Bind<PlayerHitboxView>().FromComponentInHierarchy().AsSingle();
-        
-        Container.BindInstance(_obstacleSpawnConfig).AsSingle();
-        Container.BindInstance(_obstaclePrefabsConfig).AsSingle();
 
         Container.Bind<ObstacleRegistryService>().AsSingle();
 
         Container.BindInterfacesAndSelfTo<ObstaclePoolService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<ObstacleFactory>().AsSingle();
 
+        Container.BindInterfacesAndSelfTo<RunnerWorldSpawnSystem>().AsSingle().NonLazy();
+        Container.BindInterfacesAndSelfTo<WorldSegmentPoolService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<ObstacleSpawnSystem>().AsSingle().NonLazy();
+        
         Container.BindInterfacesAndSelfTo<ObstacleCleanupSystem>().AsSingle().NonLazy();
         
         Container.BindInterfacesAndSelfTo<SpeedSystem>().AsSingle().NonLazy();
@@ -48,6 +53,7 @@ public class GameSceneInstaller : MonoInstaller
 #if UNITY_EDITOR
         Container.Bind<EditorDebugRestartInputView>().FromComponentInHierarchy().AsSingle().NonLazy();
 #endif
+        Container.Bind<SceneHierarchyService>().AsSingle().NonLazy();
     }
 
     private PlayerRespawnSystem CreateRespawnSystem(InjectContext _)
@@ -56,10 +62,13 @@ public class GameSceneInstaller : MonoInstaller
         CameraTargetFollowView cameraFollow = Container.Resolve<CameraTargetFollowView>();
         PlayerScoreSystem scoreSystem = Container.Resolve<PlayerScoreSystem>();
 
+        var restartables = Container.Resolve<List<IRestartable>>();
+
         return new PlayerRespawnSystem(
             playerView.transform,
             playerView,
             cameraFollow,
-            scoreSystem);
+            scoreSystem,
+            restartables);
     }
 }

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf9b139754583c4ebe9e2008dc1f761, type: 3}
+  m_Name: Config_WorldGeneration
+  m_EditorClassIdentifier: Assembly-CSharp::WorldGenerationConfig
+  <RoadSegmentPrefabs>k__BackingField:
+  - {fileID: 3733105731558460250, guid: 000098ebd5876cc4a989253b1596cf29, type: 3}
+  - {fileID: 3733105731558460250, guid: 141a0b51179a84544b540a6668dc3486, type: 3}
+  - {fileID: 3733105731558460250, guid: 0c5d130187ae20e40910b87f109fdcda, type: 3}
+  - {fileID: 3733105731558460250, guid: a8cbea10ef0e8c440a19ff82c21402c7, type: 3}
+  <InitialSegmentsCount>k__BackingField: 12
+  <SegmentsAheadDistance>k__BackingField: 200
+  <DespawnDistance>k__BackingField: 30

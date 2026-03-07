@@ -8,22 +8,26 @@ public class ObstaclePoolService : IObstaclePoolService
     private readonly DiContainer _container;
     private readonly ObstaclePrefabsConfig _prefabsConfig;
     private readonly ObstacleSpawnConfig _spawnConfig;
+    private readonly SceneHierarchyService _sceneHierarchyService;
 
     private readonly Dictionary<EObstacleType, Queue<ObstacleView>> _poolsByType = new();
     private readonly System.Random _random = new();
 
-    private Transform _poolRoot;
+    private readonly Transform _poolRoot;
 
     public ObstaclePoolService(
         DiContainer container,
         ObstaclePrefabsConfig prefabsConfig,
-        ObstacleSpawnConfig spawnConfig)
+        ObstacleSpawnConfig spawnConfig,
+        SceneHierarchyService sceneHierarchyService)
     {
         _container = container;
         _prefabsConfig = prefabsConfig;
         _spawnConfig = spawnConfig;
+        _sceneHierarchyService = sceneHierarchyService;
 
-        CreatePoolRoot();
+        _poolRoot = _sceneHierarchyService.ObstaclesPoolRoot;
+
         Prewarm();
     }
 
@@ -94,11 +98,5 @@ public class ObstaclePoolService : IObstaclePoolService
 
         instance.Hide();
         return instance;
-    }
-
-    private void CreatePoolRoot()
-    {
-        GameObject root = new GameObject("Obstacles_PoolRoot");
-        _poolRoot = root.transform;
     }
 }

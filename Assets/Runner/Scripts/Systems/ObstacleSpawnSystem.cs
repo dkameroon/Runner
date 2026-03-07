@@ -2,12 +2,15 @@ using System;
 using UnityEngine;
 using Zenject;
 
-public class ObstacleSpawnSystem : ITickable
+public class ObstacleSpawnSystem : ITickable, IRestartable
 {
     private readonly RunnerGameConfig _runnerGameConfig;
     private readonly ObstacleSpawnConfig _spawnConfig;
     private readonly IObstacleFactory _factory;
     private readonly Transform _playerTransform;
+    private readonly Transform _cameraTransform;
+    private readonly IObstaclePoolService _poolService;
+    private readonly ObstacleRegistryService _registry;
 
     private float _timer;
     private float _startDelayTimer;
@@ -15,20 +18,24 @@ public class ObstacleSpawnSystem : ITickable
 
     private readonly System.Random _random = new();
 
-    private readonly Transform _cameraTransform;
-
     public ObstacleSpawnSystem(
         RunnerGameConfig runnerGameConfig,
         ObstacleSpawnConfig spawnConfig,
         IObstacleFactory factory,
         PlayerView playerView,
-        CameraTargetFollowView cameraTargetFollowView)
+        CameraTargetFollowView cameraTargetFollowView,
+        IObstaclePoolService poolService,
+        ObstacleRegistryService registry)
     {
         _runnerGameConfig = runnerGameConfig;
         _spawnConfig = spawnConfig;
         _factory = factory;
         _playerTransform = playerView.transform;
         _cameraTransform = cameraTargetFollowView.transform;
+        _poolService = poolService;
+        _registry = registry;
+
+        ResetSpawnState();
     }
 
     public void Tick()
@@ -52,8 +59,6 @@ public class ObstacleSpawnSystem : ITickable
             cameraZ + _spawnConfig.SpawnDistanceAhead);
 
         _lastSpawnZ = nextZ;
-        
-        _lastSpawnZ = nextZ;
 
         EPlayerLane lane = GetRandomLane();
         float x = GetLaneX(lane, _runnerGameConfig.LaneOffsetX);
@@ -64,6 +69,36 @@ public class ObstacleSpawnSystem : ITickable
         Quaternion rotation = Quaternion.identity;
 
         _factory.Create(type, position, rotation);
+    }
+
+    public void Restart()
+    {
+        ReturnAllActiveObstaclesToPool();
+        ResetSpawnState();
+    }
+
+    private void ResetSpawnState()
+    {
+        _timer = 0f;
+        _startDelayTimer = 0f;
+        _lastSpawnZ = _cameraTransform.position.z;
+    }
+
+    private void ReturnAllActiveObstaclesToPool()
+    {
+        for (int i = _registry.Active.Count - 1; i >= 0; i--)
+        {
+            ObstacleView obstacle = _registry.Active[i];
+
+            if (obstacle == null)
+            {
+                _registry.RemoveAt(i);
+                continue;
+            }
+
+            _poolService.Return(obstacle);
+            _registry.RemoveAt(i);
+        }
     }
 
     private EPlayerLane GetRandomLane()
