@@ -19,7 +19,6 @@ public class PlayerSlideState : IPlayerState
     {
         _context.PlayerAnimatorView.TriggerSlide();
         _context.PlayerHitboxView.ApplySlide();
-        _context.PlayerView.DoSlide();
         _timeLeft = _context.RunnerGameConfig.SlideDurationSeconds;
     }
 

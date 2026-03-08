@@ -10,6 +10,7 @@ public class RunnerWorldSpawnSystem : ITickable, IInitializable, IRestartable
     private readonly SceneHierarchyService _sceneHierarchyService;
 
     private readonly List<RoadSegmentView> _activeSegments = new();
+    public int ActiveSegmentCount => _activeSegments.Count;
 
     private readonly Transform _runtimeRoot;
     private Vector3 _nextSpawnPosition;

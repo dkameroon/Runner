@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerScoreSystem
 {
-    public int Score { get; private set; }
+    public int CurrentScore { get; private set; }
     public float DistanceMeters { get; private set; }
 
     public event Action<int> ScoreChanged;
@@ -18,9 +18,9 @@ public class PlayerScoreSystem
 
     public void Reset()
     {
-        Score = 0;
+        CurrentScore = 0;
         DistanceMeters = 0f;
-        ScoreChanged?.Invoke(Score);
+        ScoreChanged?.Invoke(CurrentScore);
     }
 
     public void AddDistance(float deltaMeters)
@@ -31,10 +31,10 @@ public class PlayerScoreSystem
         DistanceMeters += deltaMeters;
 
         int newScore = Mathf.FloorToInt(DistanceMeters * _runnerGameConfig.ScorePerMeter);
-        if (newScore == Score)
+        if (newScore == CurrentScore)
             return;
 
-        Score = newScore;
-        ScoreChanged?.Invoke(Score);
+        CurrentScore = newScore;
+        ScoreChanged?.Invoke(CurrentScore);
     }
 }

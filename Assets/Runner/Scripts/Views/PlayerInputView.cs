@@ -11,7 +11,9 @@ public class PlayerInputView : MonoBehaviour
     private IPlayerInputStrategy _inputStrategy;
 
     [Inject]
-    public void Construct(PlayerView playerView, PlayerStateMachineSystem playerStateMachineSystem)
+    public void Construct(
+        PlayerView playerView,
+        PlayerStateMachineSystem playerStateMachineSystem)
     {
         _playerView = playerView;
         _playerStateMachineSystem = playerStateMachineSystem;
@@ -39,13 +41,10 @@ public class PlayerInputView : MonoBehaviour
 
     private void Update()
     {
-        if (_inputStrategy == null)
-        {
-            Debug.LogError("PlayerInputView: input strategy is not created. Check Zenject injection and SceneContext.");
+        if (_inputStrategy == null || _playerStateMachineSystem == null)
             return;
-        }
 
-        if (_playerStateMachineSystem == null || !_playerStateMachineSystem.CanProcessInput())
+        if (_playerStateMachineSystem.CanProcessInput() == false)
             return;
 
         _inputStrategy.Tick();

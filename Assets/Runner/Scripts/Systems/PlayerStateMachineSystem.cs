@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Zenject;
 
-public class PlayerStateMachineSystem : ITickable, IInitializable
+public class PlayerStateMachineSystem : ITickable, IInitializable, IRestartable
 {
     public EPlayerState CurrentStateType => _currentState.StateType;
 
@@ -15,6 +15,7 @@ public class PlayerStateMachineSystem : ITickable, IInitializable
     private readonly PlayerDeadState _deadState;
 
     private IPlayerState _currentState;
+    public string CurrentStateName => CurrentStateType.ToString();
 
     public PlayerStateMachineSystem(PlayerStateContextModel context)
     {
@@ -68,6 +69,11 @@ public class PlayerStateMachineSystem : ITickable, IInitializable
     internal void ReturnToRun()
     {
         SwitchState(_runState);
+    }
+    
+    public void Restart()
+    {
+        SetRun();
     }
 
     private void SwitchState(IPlayerState newState)

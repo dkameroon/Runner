@@ -1,16 +1,17 @@
-using System;
 using UnityEngine;
 using Zenject;
 
 public class ObstacleSpawnSystem : ITickable, IRestartable
 {
+    public int ActiveObstacleCount => _registry.Active.Count;
+
     private readonly RunnerGameConfig _runnerGameConfig;
     private readonly ObstacleSpawnConfig _spawnConfig;
     private readonly IObstacleFactory _factory;
-    private readonly Transform _playerTransform;
     private readonly Transform _cameraTransform;
     private readonly IObstaclePoolService _poolService;
     private readonly ObstacleRegistryService _registry;
+    private readonly GameplaySessionService _gameplaySessionService;
 
     private float _timer;
     private float _startDelayTimer;
@@ -22,24 +23,27 @@ public class ObstacleSpawnSystem : ITickable, IRestartable
         RunnerGameConfig runnerGameConfig,
         ObstacleSpawnConfig spawnConfig,
         IObstacleFactory factory,
-        PlayerView playerView,
         CameraTargetFollowView cameraTargetFollowView,
         IObstaclePoolService poolService,
-        ObstacleRegistryService registry)
+        ObstacleRegistryService registry,
+        GameplaySessionService gameplaySessionService)
     {
         _runnerGameConfig = runnerGameConfig;
         _spawnConfig = spawnConfig;
         _factory = factory;
-        _playerTransform = playerView.transform;
         _cameraTransform = cameraTargetFollowView.transform;
         _poolService = poolService;
         _registry = registry;
+        _gameplaySessionService = gameplaySessionService;
 
         ResetSpawnState();
     }
 
     public void Tick()
     {
+        if (_gameplaySessionService.IsGameplayActive == false)
+            return;
+
         _startDelayTimer += Time.deltaTime;
 
         if (_startDelayTimer < _runnerGameConfig.WarmupSeconds)

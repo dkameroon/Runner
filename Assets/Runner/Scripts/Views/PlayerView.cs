@@ -93,13 +93,7 @@ public class PlayerView : MonoBehaviour, IMovementToggle, IRespawnable
         _jumpTimerSeconds = 0f;
         _jumpBaseY = transform.position.y;
     }
-
-    public void DoSlide()
-    {
-        if (!_isInitialized)
-            return;
-        
-    }
+    
 
     private void InitializeIfNeeded()
     {

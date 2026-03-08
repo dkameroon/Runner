@@ -12,7 +12,6 @@ public class ProjectStartupSystem : IInitializable
 
     public void Initialize()
     {
-        Debug.Log("ProjectStartupSystem: Initialize -> Load Game");
         _sceneLoaderService.Load(SceneNames.Game);
     }
 }

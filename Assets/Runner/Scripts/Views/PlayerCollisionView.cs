@@ -15,7 +15,6 @@ public class PlayerCollisionView : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("OnTriggerEnter" +  other.gameObject.name);
         if (_playerStateMachineSystem.CurrentStateType == EPlayerState.Dead)
             return;
 
