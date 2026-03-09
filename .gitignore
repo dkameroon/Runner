@@ -21,9 +21,11 @@ MemoryCaptures/
 *.pdb.meta
 
 # Firebase large native binaries
-Assets/Firebase/Plugins/x86_64/
+Assets/Firebase/Plugins/**/x86_64/**
 Assets/Firebase/Plugins/**/*.bundle
 Assets/Firebase/Plugins/**/*.so
+Assets/Firebase/Plugins/**/*.bundle.meta
+Assets/Firebase/Plugins/**/*.so.meta
 
 # Resolver generated artifacts
 Assets/GeneratedLocalRepo/
