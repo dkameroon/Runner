@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Zenject;
 
-public class PlayerStateMachineSystem : ITickable, IInitializable, IRestartable
+public class PlayerStateMachineSystem : ITickable, IRestartable
 {
     public EPlayerState CurrentStateType => _currentState.StateType;
 
@@ -30,10 +30,6 @@ public class PlayerStateMachineSystem : ITickable, IInitializable, IRestartable
         StateChanged?.Invoke(_currentState.StateType);
     }
     
-    public void Initialize()
-    {
-        SetRun();
-    }
 
     public void Tick()
     {
@@ -79,14 +75,14 @@ public class PlayerStateMachineSystem : ITickable, IInitializable, IRestartable
     private void SwitchState(IPlayerState newState)
     {
         if (newState == _currentState)
+        {
             return;
+        }
 
         _currentState.Exit();
         _currentState = newState;
+        _currentState.Enter();
 
         StateChanged?.Invoke(_currentState.StateType);
-
-        _currentState.Enter();
-        
     }
 }

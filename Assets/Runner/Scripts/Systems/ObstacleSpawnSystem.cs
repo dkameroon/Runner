@@ -36,23 +36,29 @@ public class ObstacleSpawnSystem : ITickable, IRestartable
         _registry = registry;
         _gameplaySessionService = gameplaySessionService;
 
-        ResetSpawnState();
+        ResetSpawnState(_cameraTransform.position.z);
     }
 
     public void Tick()
     {
         if (_gameplaySessionService.IsGameplayActive == false)
+        {
             return;
+        }
 
         _startDelayTimer += Time.deltaTime;
 
         if (_startDelayTimer < _runnerGameConfig.WarmupSeconds)
+        {
             return;
+        }
 
         _timer += Time.deltaTime;
 
         if (_timer < _spawnConfig.SpawnIntervalSeconds)
+        {
             return;
+        }
 
         _timer = 0f;
 
@@ -78,14 +84,20 @@ public class ObstacleSpawnSystem : ITickable, IRestartable
     public void Restart()
     {
         ReturnAllActiveObstaclesToPool();
-        ResetSpawnState();
+        ResetSpawnState(_cameraTransform.position.z);
     }
 
-    private void ResetSpawnState()
+    public void RestartAfterContinue(float playerZ)
+    {
+        ReturnAllActiveObstaclesToPool();
+        ResetSpawnState(playerZ);
+    }
+
+    private void ResetSpawnState(float referenceZ)
     {
         _timer = 0f;
-        _startDelayTimer = 0f;
-        _lastSpawnZ = _cameraTransform.position.z;
+        _startDelayTimer = _runnerGameConfig.WarmupSeconds;
+        _lastSpawnZ = referenceZ;
     }
 
     private void ReturnAllActiveObstaclesToPool()

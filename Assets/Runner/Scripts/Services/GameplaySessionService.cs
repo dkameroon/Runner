@@ -11,4 +11,9 @@ public class GameplaySessionService
     {
         IsGameplayActive = false;
     }
+
+    public void SetGameplayActive(bool isActive)
+    {
+        IsGameplayActive = isActive;
+    }
 }

@@ -18,9 +18,5 @@ public class ObstacleRegistryService
     {
         _active.RemoveAt(index);
     }
-    
-    public void Clear()
-    {
-        _active.Clear();
-    }
+
 }

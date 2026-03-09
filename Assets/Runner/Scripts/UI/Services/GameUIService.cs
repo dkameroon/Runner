@@ -4,26 +4,31 @@ using Zenject;
 public class GameUIService : IInitializable, IDisposable
 {
     private readonly MainMenuWindow _mainMenuWindow;
-    private readonly DefeatPopup _defeatPopup;
+    private readonly PopupService _popupService;
     private readonly GameHUDView _gameHudView;
+    private readonly AuthFlowService _authFlowService;
+    private readonly IAdsService _adsService;
     private readonly GameFlowSystem _gameFlowSystem;
     private readonly PlayerStateMachineSystem _playerStateMachineSystem;
     private readonly PlayerScoreSystem _playerScoreSystem;
-    
 
     public GameUIService(
         MainMenuWindow mainMenuWindow,
-        GameFlowSystem gameFlowSystem,
-        DefeatPopup defeatPopup,
-        PlayerStateMachineSystem playerStateMachineSystem, 
+        PopupService popupService,
         GameHUDView gameHudView,
+        AuthFlowService authFlowService,
+        IAdsService adsService,
+        PlayerStateMachineSystem playerStateMachineSystem,
+        GameFlowSystem gameFlowSystem,
         PlayerScoreSystem playerScoreSystem)
     {
         _mainMenuWindow = mainMenuWindow;
-        _gameFlowSystem = gameFlowSystem;
-        _defeatPopup = defeatPopup;
-        _playerStateMachineSystem = playerStateMachineSystem;
+        _popupService = popupService;
         _gameHudView = gameHudView;
+        _authFlowService = authFlowService;
+        _adsService = adsService;
+        _playerStateMachineSystem = playerStateMachineSystem;
+        _gameFlowSystem = gameFlowSystem;
         _playerScoreSystem = playerScoreSystem;
     }
 
@@ -37,20 +42,30 @@ public class GameUIService : IInitializable, IDisposable
     public void Dispose()
     {
         _gameFlowSystem.StateChanged -= OnGameLoopStateChanged;
-        _playerStateMachineSystem.StateChanged += OnPlayerStateChanged;
+        _playerStateMachineSystem.StateChanged -= OnPlayerStateChanged;
     }
 
     private void OnGameLoopStateChanged(EGameLoopState state)
     {
         ApplyState(state);
     }
-    
+
     private void OnPlayerStateChanged(EPlayerState state)
     {
         if (state != EPlayerState.Dead)
+        {
             return;
+        }
 
-        _defeatPopup.SetScore(_playerScoreSystem.CurrentScore);
+        if (_gameFlowSystem.CurrentState == EGameLoopState.Defeat)
+        {
+            return;
+        }
+
+        DefeatPopup defeatPopup = _popupService.ShowDefeatPopup();
+        defeatPopup.SetScore(_playerScoreSystem.CurrentScore);
+        defeatPopup.SetWatchAdButtonState(_adsService.IsRewardedAdReady);
+
         _gameFlowSystem.ShowDefeat();
     }
 
@@ -59,20 +74,23 @@ public class GameUIService : IInitializable, IDisposable
         switch (state)
         {
             case EGameLoopState.MainMenu:
-                _mainMenuWindow.Show();
-                _defeatPopup.Hide();
+                if (_authFlowService.IsAuthScreenActive == false)
+                {
+                    _mainMenuWindow.Show();
+                }
+
+                _popupService.HideDefeatPopup();
                 _gameHudView.Hide();
                 break;
 
             case EGameLoopState.Playing:
                 _mainMenuWindow.Hide();
-                _defeatPopup.Hide();
+                _popupService.HideDefeatPopup();
                 _gameHudView.Show();
                 break;
 
             case EGameLoopState.Defeat:
                 _mainMenuWindow.Hide();
-                _defeatPopup.Show();
                 _gameHudView.Hide();
                 break;
         }

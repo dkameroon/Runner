@@ -1,17 +1,20 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using TMPro;
 
 public class DefeatPopup : MonoBehaviour
 {
     [SerializeField] private Button _restartButton;
-    [SerializeField] private Button _exitButton;
+    [SerializeField] private Button _mainMenuButton;
     [SerializeField] private Button _watchAdButton;
     [SerializeField] private TextMeshProUGUI _scoreValueText;
 
     private PlayerRespawnSystem _playerRespawnSystem;
     private GameFlowSystem _gameFlowSystem;
+
+    public event Action WatchAdClicked;
 
     [Inject]
     public void Construct(
@@ -25,15 +28,15 @@ public class DefeatPopup : MonoBehaviour
     private void OnEnable()
     {
         _restartButton.onClick.AddListener(OnRestartClicked);
-        _exitButton.onClick.AddListener(OnExitClicked);
-        _watchAdButton.onClick.AddListener(OnWatchAdClicked);
+        _mainMenuButton.onClick.AddListener(OnExitClicked);
+        _watchAdButton.onClick.AddListener(OnWatchAdButtonClicked);
     }
 
     private void OnDisable()
     {
         _restartButton.onClick.RemoveListener(OnRestartClicked);
-        _exitButton.onClick.RemoveListener(OnExitClicked);
-        _watchAdButton.onClick.RemoveListener(OnWatchAdClicked);
+        _mainMenuButton.onClick.RemoveListener(OnExitClicked);
+        _watchAdButton.onClick.RemoveListener(OnWatchAdButtonClicked);
     }
 
     public void Show()
@@ -50,7 +53,12 @@ public class DefeatPopup : MonoBehaviour
     {
         _scoreValueText.text = $"SCORE: {score}";
     }
-    
+
+    public void SetWatchAdButtonState(bool isEnabled)
+    {
+        _watchAdButton.interactable = isEnabled;
+    }
+
     private void OnRestartClicked()
     {
         _playerRespawnSystem.Respawn();
@@ -63,8 +71,8 @@ public class DefeatPopup : MonoBehaviour
         _gameFlowSystem.EnterMainMenu();
     }
 
-    private void OnWatchAdClicked()
+    private void OnWatchAdButtonClicked()
     {
-        Debug.Log("DefeatPopup: Rewarded Ads is not integrated yet.");
+        WatchAdClicked?.Invoke();
     }
 }

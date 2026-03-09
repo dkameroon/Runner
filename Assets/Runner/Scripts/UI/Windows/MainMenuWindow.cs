@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,6 +11,9 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Button _exitButton;
 
     private GameFlowSystem _gameFlowSystem;
+
+    public event Action LogoutClicked;
+    public event Action LeaderboardClicked;
 
     [Inject]
     public void Construct(GameFlowSystem gameFlowSystem)
@@ -44,7 +48,9 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_gameFlowSystem.CurrentState != EGameLoopState.MainMenu)
+        {
             return;
+        }
 
         GameObject clickedObject = eventData.pointerPressRaycast.gameObject;
 
@@ -55,19 +61,21 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
         }
 
         if (clickedObject.GetComponentInParent<Button>() != null)
+        {
             return;
+        }
 
         _gameFlowSystem.StartGame();
     }
 
     private void OnLeaderboardClicked()
     {
-        Debug.Log("MainMenuWindow: Leaderboard button clicked.");
+        LeaderboardClicked?.Invoke();
     }
 
     private void OnLogoutClicked()
     {
-        Debug.Log("MainMenuWindow: Logout button clicked.");
+        LogoutClicked?.Invoke();
     }
 
     private void OnExitClicked()

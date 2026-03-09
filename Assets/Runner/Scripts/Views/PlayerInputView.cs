@@ -3,49 +3,44 @@ using Zenject;
 
 public class PlayerInputView : MonoBehaviour
 {
-    [SerializeField] private bool _forceMobileInputInEditor;
-
     private PlayerView _playerView;
     private PlayerStateMachineSystem _playerStateMachineSystem;
-
     private IPlayerInputStrategy _inputStrategy;
 
     [Inject]
     public void Construct(
         PlayerView playerView,
-        PlayerStateMachineSystem playerStateMachineSystem)
+        PlayerStateMachineSystem playerStateMachineSystem,
+        IPlayerInputStrategy inputStrategy)
     {
         _playerView = playerView;
         _playerStateMachineSystem = playerStateMachineSystem;
-
-#if UNITY_EDITOR
-        _inputStrategy = _forceMobileInputInEditor
-            ? new MobileSwipeInputStrategy()
-            : new EditorKeyboardInputStrategy();
-#else
-        _inputStrategy = Application.isMobilePlatform
-            ? new MobileSwipeInputStrategy()
-            : new EditorKeyboardInputStrategy();
-#endif
+        _inputStrategy = inputStrategy;
 
         _inputStrategy.CommandTriggered += OnCommandTriggered;
     }
 
     private void OnDestroy()
     {
-        if (_inputStrategy != null)
+        if (_inputStrategy == null)
         {
-            _inputStrategy.CommandTriggered -= OnCommandTriggered;
+            return;
         }
+
+        _inputStrategy.CommandTriggered -= OnCommandTriggered;
     }
 
     private void Update()
     {
         if (_inputStrategy == null || _playerStateMachineSystem == null)
+        {
             return;
+        }
 
         if (_playerStateMachineSystem.CanProcessInput() == false)
+        {
             return;
+        }
 
         _inputStrategy.Tick();
     }
@@ -53,7 +48,9 @@ public class PlayerInputView : MonoBehaviour
     private void OnCommandTriggered(EPlayerInputCommand command)
     {
         if (_playerView == null || _playerStateMachineSystem == null)
+        {
             return;
+        }
 
         switch (command)
         {

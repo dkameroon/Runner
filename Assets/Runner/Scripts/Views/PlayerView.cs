@@ -73,12 +73,16 @@ public class PlayerView : MonoBehaviour, IMovementToggle, IRespawnable
 
     public void Respawn()
     {
-        SetMovementEnabled(true);
-
         _playerModel.SetLane(EPlayerLane.Center);
         ApplyLaneInstant(EPlayerLane.Center);
-
         CancelJumpAndSnapToBaseY();
+        SetMovementEnabled(true);
+    }
+    
+    public void ContinueAfterDefeat()
+    {
+        CancelJumpAndSnapToBaseY();
+        SetMovementEnabled(true);
     }
 
     public void DoJump()
@@ -108,7 +112,7 @@ public class PlayerView : MonoBehaviour, IMovementToggle, IRespawnable
         _laneLerpSpeed = CalculateLaneLerpSpeed(_runnerGameConfig.LaneChangeDurationSeconds);
         ApplyLaneInstant(_playerModel.CurrentLane);
 
-        _isMovementEnabled = true;
+        _isMovementEnabled = false;
         _isInitialized = true;
     }
 

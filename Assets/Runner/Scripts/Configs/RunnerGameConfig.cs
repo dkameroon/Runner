@@ -17,6 +17,8 @@ public class RunnerGameConfig : ScriptableObject
 
     [Header("Warmup")]
     [field: SerializeField, Min(0f)] public float WarmupSeconds { get; private set; } = 3f;
+    [Header("Revive Invulnerability Seconds")]
+    [field: SerializeField] public float ReviveInvulnerabilitySeconds { get; private set; } = 2f;
 
     [Header("Lanes")]
     [field: SerializeField, Min(0.01f)] public float LaneOffsetX { get; private set; } = 1.5f;

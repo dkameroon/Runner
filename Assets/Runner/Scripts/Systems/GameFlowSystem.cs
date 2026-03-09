@@ -8,9 +8,6 @@ public class GameFlowSystem : IInitializable
     public event Action<EGameLoopState> StateChanged;
 
     private readonly PlayerView _playerView;
-    private readonly SpeedSystem _speedSystem;
-    private readonly PlayerScoreSystem _playerScoreSystem;
-    private readonly ObstacleSpawnSystem _obstacleSpawnSystem;
     private readonly PlayerStateMachineSystem _playerStateMachineSystem;
     private readonly GameplaySessionService _gameplaySessionService;
 
@@ -55,6 +52,16 @@ public class GameFlowSystem : IInitializable
         _gameplaySessionService.StopGameplay();
         _playerView.SetMovementEnabled(false);
         _playerStateMachineSystem.SetDead();
+
+        StateChanged?.Invoke(CurrentState);
+    }
+
+    public void ResumeGameAfterContinue()
+    {
+        CurrentState = EGameLoopState.Playing;
+        _gameplaySessionService.SetGameplayActive(true);
+        _playerView.SetMovementEnabled(true);
+        _playerStateMachineSystem.SetRun();
 
         StateChanged?.Invoke(CurrentState);
     }
