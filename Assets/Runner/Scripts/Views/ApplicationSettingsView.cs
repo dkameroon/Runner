@@ -13,5 +13,6 @@ public class ApplicationSettingsView : MonoBehaviour
     {
         Application.targetFrameRate = TargetFrameRate;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        QualitySettings.vSyncCount = 0;
     }
 }

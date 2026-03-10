@@ -249,7 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10763a8a46c214a4da333b8f74e9fac9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleView
-  <ObstacleType>k__BackingField: 1
+  <ObstacleType>k__BackingField: 2
   _spawnPointHolder: {fileID: 8178469459254089093}
 --- !u!114 &8178469459254089093
 MonoBehaviour:

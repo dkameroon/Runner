@@ -30,12 +30,14 @@ public class PlayerRespawnSystem
         _playerScoreUpdateView = playerScoreUpdateView;
         _obstacleSpawnSystem = obstacleSpawnSystem;
 
-        _startPosition = playerView.transform.position;
+        _startPosition = _playerView.transform.position;
     }
 
     public void Respawn()
     {
         _playerView.transform.position = _startPosition;
+        _cameraTargetFollowView.SnapToPlayer();
+
         _playerScoreUpdateView.ResetTracking();
         _playerScoreSystem.Reset();
         _playerView.Respawn();

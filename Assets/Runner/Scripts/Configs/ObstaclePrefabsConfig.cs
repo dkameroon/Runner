@@ -13,10 +13,18 @@ public class ObstaclePrefabsConfig : ScriptableObject
 
     public bool TryGetGroup(EObstacleType obstacleType, out ObstaclePrefabGroupStruct group)
     {
+        if (obstacleType == EObstacleType.None)
+        {
+            group = default;
+            return false;
+        }
+
         for (int i = 0; i < _groups.Count; i++)
         {
             if (_groups[i].ObstacleType != obstacleType)
+            {
                 continue;
+            }
 
             group = _groups[i];
             return true;

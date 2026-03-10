@@ -74,3 +74,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5eba48b82eb6e994cb12ea9a201c0634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectInstaller
+  _adMobAdsConfig: {fileID: 11400000, guid: e997f1dca64d0d74c9dbe6bfcbc5bc73, type: 2}

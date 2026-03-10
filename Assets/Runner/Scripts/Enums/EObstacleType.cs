@@ -1,6 +1,7 @@
 public enum EObstacleType
 {
-    Dodge = 0,
-    Slide = 1,
-    Jump = 2
+    None = 0,
+    Dodge = 1,
+    Slide = 2,
+    Jump = 3
 }

@@ -13,8 +13,8 @@ public class SceneHierarchyService
 
     public SceneHierarchyService()
     {
-        RuntimeRoot = CreateRoot("Runtime");
-        PoolsRoot = CreateRoot("Pools");
+        RuntimeRoot = CreateRoot("===Runtime===");
+        PoolsRoot = CreateRoot("===Pools===");
 
         RoadSegmentsRuntimeRoot = CreateChildRoot("RoadSegments_RuntimeRoot", RuntimeRoot);
         ObstaclesRuntimeRoot = CreateChildRoot("Obstacles_RuntimeRoot", RuntimeRoot);

@@ -9,6 +9,7 @@ public class GameSceneInstaller : MonoInstaller
     [SerializeField] private ObstaclePrefabsConfig _obstaclePrefabsConfig;
     [SerializeField] private WorldGenerationConfig _worldGenerationConfig;
     [SerializeField] private DebugOverlayConfig _debugOverlayConfig;
+    [SerializeField] private ObstacleDifficultyConfig _obstacleDifficultyConfig;
     
     [Header("Debug Overlay")]
     [SerializeField] private DebugOverlayView _debugOverlayView;
@@ -19,9 +20,10 @@ public class GameSceneInstaller : MonoInstaller
     [SerializeField] private LeaderboardWindow _leaderboardWindow;
     [SerializeField] private LeaderboardEntryElement _leaderboardEntryElementPrefab;
     [SerializeField] private DefeatPopup _defeatPopupPrefab;
+    [SerializeField] private PausePopup _pausePopupPrefab;
     [SerializeField] private GameHUDView _gameHudView;
     [SerializeField] private PopupCanvasRootView _popupCanvasRootView;
-    
+    [SerializeField] private PauseButtonView _pauseButtonView;
 
     public override void InstallBindings()
     {
@@ -40,7 +42,7 @@ public class GameSceneInstaller : MonoInstaller
 #if UNITY_EDITOR
         Container.Bind<IPlayerInputStrategy>().To<EditorKeyboardInputStrategy>().AsSingle();
 #else
-    Container.Bind<IPlayerInputStrategy>().To<MobileSwipeInputStrategy>().AsSingle();
+        Container.Bind<IPlayerInputStrategy>().To<MobileSwipeInputStrategy>().AsSingle();
 #endif
     }
 
@@ -50,6 +52,7 @@ public class GameSceneInstaller : MonoInstaller
         Container.BindInstance(_obstacleSpawnConfig).AsSingle();
         Container.BindInstance(_obstaclePrefabsConfig).AsSingle();
         Container.BindInstance(_worldGenerationConfig).AsSingle();
+        Container.BindInstance(_obstacleDifficultyConfig).AsSingle();
     }
 
     private void BindViews()
@@ -67,11 +70,11 @@ public class GameSceneInstaller : MonoInstaller
         Container.Bind<LeaderboardWindow>().FromInstance(_leaderboardWindow).AsSingle();
         Container.Bind<GameHUDView>().FromInstance(_gameHudView).AsSingle();
         Container.Bind<PopupCanvasRootView>().FromInstance(_popupCanvasRootView).AsSingle();
+        Container.Bind<PauseButtonView>().FromInstance(_pauseButtonView).AsSingle();
         
 #if UNITY_EDITOR
         Container.Bind<EditorDebugRestartInputView>().FromComponentInHierarchy().AsSingle().NonLazy();
 #endif
-        
     }
 
     private void BindServices()
@@ -87,10 +90,8 @@ public class GameSceneInstaller : MonoInstaller
         Container.Bind<IAuthenticationService>().To<FirebaseAuthenticationService>().AsSingle();
         Container.BindInterfacesAndSelfTo<FirestoreBootstrapProbe>().AsSingle().NonLazy();
         Container.Bind<ILeaderboardService>().To<FirebaseLeaderboardService>().AsSingle();
-        Container.Bind<IAdsService>().To<MockAdsService>().AsSingle();
 
         Container.BindInterfacesAndSelfTo<LeaderboardSubmitService>().AsSingle().NonLazy();
-        Container.BindInterfacesAndSelfTo<FirebaseBootstrapService>().AsSingle().NonLazy();
     }
     
     private void BindUIServices()
@@ -102,12 +103,14 @@ public class GameSceneInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<MainMenuFlowService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<LeaderboardFlowService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<DefeatContinueFlowService>().AsSingle().NonLazy();
-    }  
+        Container.BindInterfacesAndSelfTo<PauseFlowService>().AsSingle().NonLazy();
+    }
 
     private void BindFactories()
     {
         Container.BindInterfacesAndSelfTo<ObstacleFactory>().AsSingle();
         Container.BindInstance(_defeatPopupPrefab).AsSingle();
+        Container.BindInstance(_pausePopupPrefab).AsSingle();
         Container.BindInstance(_leaderboardEntryElementPrefab).AsSingle();
         Container.BindInterfacesAndSelfTo<PopupFactory>().AsSingle();
     }

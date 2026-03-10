@@ -23,6 +23,7 @@ public class GameFlowSystem : IInitializable
 
     public void Initialize()
     {
+        CurrentState = EGameLoopState.None;
         EnterMainMenu();
     }
 
@@ -38,6 +39,36 @@ public class GameFlowSystem : IInitializable
 
     public void StartGame()
     {
+        CurrentState = EGameLoopState.Playing;
+        _gameplaySessionService.StartGameplay();
+        _playerView.SetMovementEnabled(true);
+        _playerStateMachineSystem.SetRun();
+
+        StateChanged?.Invoke(CurrentState);
+    }
+
+    public void PauseGame()
+    {
+        if (CurrentState != EGameLoopState.Playing)
+        {
+            return;
+        }
+
+        CurrentState = EGameLoopState.Paused;
+        _gameplaySessionService.StopGameplay();
+        _playerView.SetMovementEnabled(false);
+        _playerStateMachineSystem.SetIdle();
+
+        StateChanged?.Invoke(CurrentState);
+    }
+
+    public void ResumeGameFromPause()
+    {
+        if (CurrentState != EGameLoopState.Paused)
+        {
+            return;
+        }
+
         CurrentState = EGameLoopState.Playing;
         _gameplaySessionService.StartGameplay();
         _playerView.SetMovementEnabled(true);

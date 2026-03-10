@@ -17,6 +17,6 @@ MonoBehaviour:
   - {fileID: 3733105731558460250, guid: 141a0b51179a84544b540a6668dc3486, type: 3}
   - {fileID: 3733105731558460250, guid: 0c5d130187ae20e40910b87f109fdcda, type: 3}
   - {fileID: 3733105731558460250, guid: a8cbea10ef0e8c440a19ff82c21402c7, type: 3}
-  <InitialSegmentsCount>k__BackingField: 4
+  <InitialSegmentsCount>k__BackingField: 6
   <SegmentsAheadDistance>k__BackingField: 100
   <DespawnDistance>k__BackingField: 30

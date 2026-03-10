@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 494571221407929296}
   m_Layer: 6
-  m_Name: Mesh
+  m_Name: Mesh_Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -719,7 +719,6 @@ GameObject:
   - component: {fileID: 947327523549774798}
   - component: {fileID: 1537371021306925852}
   - component: {fileID: 6632167575526325771}
-  - component: {fileID: 8228992809160614098}
   - component: {fileID: 7804374930512749122}
   - component: {fileID: 863766280056951495}
   m_Layer: 6
@@ -784,18 +783,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0a4bf6e92ba754ebd9688d0beaf14c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerView
---- !u!114 &8228992809160614098
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1489384859781884173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f34e016179a50f849aba48af3c9108bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerScoreUpdateView
 --- !u!114 &7804374930512749122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -808,7 +795,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31d225db745065643b9d60b9cb019c3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputView
-  _forceMobileInputInEditor: 0
 --- !u!114 &863766280056951495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2213,7 +2199,7 @@ GameObject:
   - component: {fileID: 5557291321570324674}
   - component: {fileID: 3115944569343294928}
   m_Layer: 6
-  m_Name: HumanMale_Character@Fast Run
+  m_Name: Model_Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

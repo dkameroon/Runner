@@ -1,27 +1,41 @@
 using System.Threading.Tasks;
 using Firebase;
 using UnityEngine;
-using Zenject;
 
-public class FirebaseBootstrapService : IInitializable
+public class FirebaseBootstrapService
 {
-    public void Initialize()
-    {
-        _ = InitializeAsync();
-    }
+    private bool _isInitialized;
+    private bool _isInitializing;
 
-    private async Task InitializeAsync()
+    public async Task<bool> InitializeAsync()
     {
-        var status = await FirebaseApp.CheckAndFixDependenciesAsync();
+        if (_isInitialized)
+        {
+            return true;
+        }
+
+        if (_isInitializing)
+        {
+            return false;
+        }
+
+        _isInitializing = true;
+
+        DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync();
 
         if (status != DependencyStatus.Available)
         {
+            _isInitializing = false;
             Debug.LogError($"Firebase dependencies error: {status}");
-            return;
+            return false;
         }
 
         FirebaseApp app = FirebaseApp.DefaultInstance;
 
+        _isInitialized = true;
+        _isInitializing = false;
+
         Debug.Log("Firebase initialized successfully");
+        return true;
     }
 }

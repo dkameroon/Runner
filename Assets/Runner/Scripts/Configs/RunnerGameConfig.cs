@@ -6,7 +6,7 @@ public class RunnerGameConfig : ScriptableObject
     [Header("Run Speed")]
     [field: SerializeField, Min(0.1f)] public float StartSpeed { get; private set; } = 6f;
     [field: SerializeField, Min(0f)] public float SpeedIncreasePerSecond { get; private set; } = 0.1f;
-    [field: SerializeField, Min(0.1f)] public float MaxSpeed { get; private set; } = 16f;
+    [field: SerializeField, Min(0.1f)] public float MaxSpeed { get; private set; } = 13f;
 
     [Header("Jump")]
     [field: SerializeField, Min(0.1f)] public float JumpHeightMeters { get; private set; } = 1.5f;
@@ -16,7 +16,7 @@ public class RunnerGameConfig : ScriptableObject
     [field: SerializeField, Min(0.01f)] public float SlideDurationSeconds { get; private set; } = 0.7f;
 
     [Header("Warmup")]
-    [field: SerializeField, Min(0f)] public float WarmupSeconds { get; private set; } = 3f;
+    [field: SerializeField, Min(0f)] public float WarmupSeconds { get; private set; } = 2.5f;
     [Header("Revive Invulnerability Seconds")]
     [field: SerializeField] public float ReviveInvulnerabilitySeconds { get; private set; } = 2f;
 

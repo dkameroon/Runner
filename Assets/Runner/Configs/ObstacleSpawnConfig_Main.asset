@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be58031bf1b55be428c148f102a12f18, type: 3}
   m_Name: ObstacleSpawnConfig_Main
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleSpawnConfig
-  <SpawnDistanceAhead>k__BackingField: 60
-  <MinDistanceBetweenObstacles>k__BackingField: 12
-  <DespawnDistanceBehindPlayer>k__BackingField: 15
-  <SpawnIntervalSeconds>k__BackingField: 1
-  <PrewarmCountPerType>k__BackingField: 5
+  <SpawnDistanceAhead>k__BackingField: 70
+  <MinDistanceBetweenObstacles>k__BackingField: 14
+  <DespawnDistanceBehindPlayer>k__BackingField: 20
+  <SpawnIntervalSeconds>k__BackingField: 0.8
+  <PrewarmCountPerType>k__BackingField: 10
   <GroundY>k__BackingField: 0
+  <SingleLanePatternChance>k__BackingField: 0.55
+  <DoubleLanePatternChance>k__BackingField: 0.35
+  <TripleLanePatternChance>k__BackingField: 0.1
+  <DisallowTripleDodgePattern>k__BackingField: 1

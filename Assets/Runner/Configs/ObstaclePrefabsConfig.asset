@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: ObstaclePrefabsConfig
   m_EditorClassIdentifier: Assembly-CSharp::ObstaclePrefabsConfig
   _groups:
-  - <ObstacleType>k__BackingField: 0
+  - <ObstacleType>k__BackingField: 1
     <Prefabs>k__BackingField:
     - {fileID: 7165985629270953232, guid: 193b832c4a1dbf74b86ba015e0891028, type: 3}
     - {fileID: 5022712606826167675, guid: f4e3f76e53cea844693e39c29848c3d4, type: 3}
-  - <ObstacleType>k__BackingField: 1
-    <Prefabs>k__BackingField:
-    - {fileID: 9175022677799226026, guid: 15b084c272d1eb84ea7cec444c6fe8e0, type: 3}
   - <ObstacleType>k__BackingField: 2
     <Prefabs>k__BackingField:
+    - {fileID: 9175022677799226026, guid: 15b084c272d1eb84ea7cec444c6fe8e0, type: 3}
+  - <ObstacleType>k__BackingField: 3
+    <Prefabs>k__BackingField:
     - {fileID: 417397732719680757, guid: 357b98943fdf11649807110dfb78897b, type: 3}
-    - {fileID: 6384647083616463727, guid: 65cac1f9db1f22e419ccd600a63c393d, type: 3}
+    - {fileID: 509313768580961048, guid: e16ad334e4c68484888837fa4163a740, type: 3}
     - {fileID: 7546918146751233662, guid: 9b85ad5622143bb4abfcb1d69acea39b, type: 3}
