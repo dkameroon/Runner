@@ -1723,5 +1723,5 @@ MonoBehaviour:
   _restartButton: {fileID: 1983259510433967412}
   _mainMenuButton: {fileID: 3534545430344559180}
   _watchAdButton: {fileID: 8170971370296215679}
-  _settingsButton: {fileID: 0}
+  _settingsButton: {fileID: 232532864453003782}
   _scoreValueText: {fileID: 499384817903639526}
