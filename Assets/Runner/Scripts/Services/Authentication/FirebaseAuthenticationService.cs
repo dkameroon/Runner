@@ -10,8 +10,18 @@ public class FirebaseAuthenticationService : IAuthenticationService
     public string UserEmail => CurrentUser?.Email ?? string.Empty;
     public string UserLogin { get; private set; } = string.Empty;
 
-    private FirebaseAuth Auth => FirebaseAuth.DefaultInstance;
-    private FirebaseUser CurrentUser => Auth.CurrentUser;
+    private readonly FirebaseAuthErrorMessageProvider _firebaseAuthErrorMessageProvider;
+    private readonly FirebaseAuth _auth;
+
+    private FirebaseUser CurrentUser => _auth.CurrentUser;
+
+    public FirebaseAuthenticationService(
+        FirebaseAuthErrorMessageProvider firebaseAuthErrorMessageProvider,
+        FirebaseServiceProvider firebaseServiceProvider)
+    {
+        _firebaseAuthErrorMessageProvider = firebaseAuthErrorMessageProvider;
+        _auth = firebaseServiceProvider.Auth;
+    }
 
     public Task InitializeAsync()
     {
@@ -39,7 +49,7 @@ public class FirebaseAuthenticationService : IAuthenticationService
     {
         try
         {
-            AuthResult authResult = await Auth.SignInWithEmailAndPasswordAsync(email, password);
+            AuthResult authResult = await _auth.SignInWithEmailAndPasswordAsync(email, password);
             FirebaseUser user = authResult.User;
 
             UserLogin = user.DisplayName ?? string.Empty;
@@ -49,24 +59,16 @@ public class FirebaseAuthenticationService : IAuthenticationService
         catch (FirebaseException firebaseException)
         {
             Debug.LogError(firebaseException);
-            return AuthOperationResultData.Failure(firebaseException.Message);
+            return AuthOperationResultData.Failure(
+                _firebaseAuthErrorMessageProvider.GetMessage(firebaseException));
         }
     }
 
-    public async Task<AuthOperationResultData> SignUpAsync(
-        string email,
-        string login,
-        string password,
-        string confirmPassword)
+    public async Task<AuthOperationResultData> SignUpAsync(string email, string login, string password)
     {
-        if (password != confirmPassword)
-        {
-            return AuthOperationResultData.Failure("Passwords do not match.");
-        }
-
         try
         {
-            AuthResult authResult = await Auth.CreateUserWithEmailAndPasswordAsync(email, password);
+            AuthResult authResult = await _auth.CreateUserWithEmailAndPasswordAsync(email, password);
             FirebaseUser user = authResult.User;
 
             UserProfile userProfile = new UserProfile
@@ -75,7 +77,6 @@ public class FirebaseAuthenticationService : IAuthenticationService
             };
 
             await user.UpdateUserProfileAsync(userProfile);
-
             await user.ReloadAsync();
 
             UserLogin = login;
@@ -84,13 +85,15 @@ public class FirebaseAuthenticationService : IAuthenticationService
         }
         catch (FirebaseException firebaseException)
         {
-            return AuthOperationResultData.Failure(firebaseException.Message);
+            Debug.LogError(firebaseException);
+            return AuthOperationResultData.Failure(
+                _firebaseAuthErrorMessageProvider.GetMessage(firebaseException));
         }
     }
 
     public Task<AuthOperationResultData> SignOutAsync()
     {
-        Auth.SignOut();
+        _auth.SignOut();
         UserLogin = string.Empty;
 
         return Task.FromResult(AuthOperationResultData.Success());

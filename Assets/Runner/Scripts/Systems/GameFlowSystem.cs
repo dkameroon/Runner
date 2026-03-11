@@ -7,18 +7,11 @@ public class GameFlowSystem : IInitializable
 
     public event Action<EGameLoopState> StateChanged;
 
-    private readonly PlayerView _playerView;
-    private readonly PlayerStateMachineSystem _playerStateMachineSystem;
-    private readonly GameplaySessionService _gameplaySessionService;
+    private readonly PlayerGameStateService _playerGameStateService;
 
-    public GameFlowSystem(
-        PlayerView playerView,
-        PlayerStateMachineSystem playerStateMachineSystem,
-        GameplaySessionService gameplaySessionService)
+    public GameFlowSystem(PlayerGameStateService playerGameStateService)
     {
-        _playerView = playerView;
-        _playerStateMachineSystem = playerStateMachineSystem;
-        _gameplaySessionService = gameplaySessionService;
+        _playerGameStateService = playerGameStateService;
     }
 
     public void Initialize()
@@ -29,22 +22,22 @@ public class GameFlowSystem : IInitializable
 
     public void EnterMainMenu()
     {
-        CurrentState = EGameLoopState.MainMenu;
-        _gameplaySessionService.StopGameplay();
-        _playerView.SetMovementEnabled(false);
-        _playerStateMachineSystem.SetIdle();
+        if (CurrentState == EGameLoopState.MainMenu)
+        {
+            return;
+        }
 
-        StateChanged?.Invoke(CurrentState);
+        SetState(EGameLoopState.MainMenu, _playerGameStateService.ApplyMainMenuState);
     }
 
     public void StartGame()
     {
-        CurrentState = EGameLoopState.Playing;
-        _gameplaySessionService.StartGameplay();
-        _playerView.SetMovementEnabled(true);
-        _playerStateMachineSystem.SetRun();
+        if (CurrentState == EGameLoopState.Playing)
+        {
+            return;
+        }
 
-        StateChanged?.Invoke(CurrentState);
+        SetState(EGameLoopState.Playing, _playerGameStateService.ApplyPlayingState);
     }
 
     public void PauseGame()
@@ -54,12 +47,7 @@ public class GameFlowSystem : IInitializable
             return;
         }
 
-        CurrentState = EGameLoopState.Paused;
-        _gameplaySessionService.StopGameplay();
-        _playerView.SetMovementEnabled(false);
-        _playerStateMachineSystem.SetIdle();
-
-        StateChanged?.Invoke(CurrentState);
+        SetState(EGameLoopState.Paused, _playerGameStateService.ApplyPausedState);
     }
 
     public void ResumeGameFromPause()
@@ -69,31 +57,33 @@ public class GameFlowSystem : IInitializable
             return;
         }
 
-        CurrentState = EGameLoopState.Playing;
-        _gameplaySessionService.StartGameplay();
-        _playerView.SetMovementEnabled(true);
-        _playerStateMachineSystem.SetRun();
-
-        StateChanged?.Invoke(CurrentState);
+        SetState(EGameLoopState.Playing, _playerGameStateService.ApplyResumeFromPauseState);
     }
 
     public void ShowDefeat()
     {
-        CurrentState = EGameLoopState.Defeat;
-        _gameplaySessionService.StopGameplay();
-        _playerView.SetMovementEnabled(false);
-        _playerStateMachineSystem.SetDead();
+        if (CurrentState == EGameLoopState.Defeat)
+        {
+            return;
+        }
 
-        StateChanged?.Invoke(CurrentState);
+        SetState(EGameLoopState.Defeat, _playerGameStateService.ApplyDefeatState);
     }
 
     public void ResumeGameAfterContinue()
     {
-        CurrentState = EGameLoopState.Playing;
-        _gameplaySessionService.SetGameplayActive(true);
-        _playerView.SetMovementEnabled(true);
-        _playerStateMachineSystem.SetRun();
+        if (CurrentState != EGameLoopState.Defeat)
+        {
+            return;
+        }
 
+        SetState(EGameLoopState.Playing, _playerGameStateService.ApplyContinueAfterDefeatState);
+    }
+
+    private void SetState(EGameLoopState newState, Action applyStateAction)
+    {
+        CurrentState = newState;
+        applyStateAction.Invoke();
         StateChanged?.Invoke(CurrentState);
     }
 }

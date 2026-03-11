@@ -3,18 +3,21 @@ using Zenject;
 
 public class PlayerInputView : MonoBehaviour
 {
-    private PlayerView _playerView;
+    private PlayerMovementSystem _playerMovementSystem;
     private PlayerStateMachineSystem _playerStateMachineSystem;
+    private GameFlowSystem _gameFlowSystem;
     private IPlayerInputStrategy _inputStrategy;
 
     [Inject]
     public void Construct(
-        PlayerView playerView,
+        PlayerMovementSystem playerMovementSystem,
         PlayerStateMachineSystem playerStateMachineSystem,
+        GameFlowSystem gameFlowSystem,
         IPlayerInputStrategy inputStrategy)
     {
-        _playerView = playerView;
+        _playerMovementSystem = playerMovementSystem;
         _playerStateMachineSystem = playerStateMachineSystem;
+        _gameFlowSystem = gameFlowSystem;
         _inputStrategy = inputStrategy;
 
         _inputStrategy.CommandTriggered += OnCommandTriggered;
@@ -32,7 +35,12 @@ public class PlayerInputView : MonoBehaviour
 
     private void Update()
     {
-        if (_inputStrategy == null || _playerStateMachineSystem == null)
+        if (_inputStrategy == null || _playerStateMachineSystem == null || _gameFlowSystem == null)
+        {
+            return;
+        }
+
+        if (_gameFlowSystem.CurrentState != EGameLoopState.Playing)
         {
             return;
         }
@@ -47,7 +55,12 @@ public class PlayerInputView : MonoBehaviour
 
     private void OnCommandTriggered(EPlayerInputCommand command)
     {
-        if (_playerView == null || _playerStateMachineSystem == null)
+        if (_playerMovementSystem == null || _playerStateMachineSystem == null || _gameFlowSystem == null)
+        {
+            return;
+        }
+
+        if (_gameFlowSystem.CurrentState != EGameLoopState.Playing)
         {
             return;
         }
@@ -55,11 +68,11 @@ public class PlayerInputView : MonoBehaviour
         switch (command)
         {
             case EPlayerInputCommand.LaneLeft:
-                _playerView.TryChangeLane(-1);
+                _playerMovementSystem.TryChangeLane(-1);
                 break;
 
             case EPlayerInputCommand.LaneRight:
-                _playerView.TryChangeLane(1);
+                _playerMovementSystem.TryChangeLane(1);
                 break;
 
             case EPlayerInputCommand.Jump:

@@ -2,18 +2,13 @@ public class GameplaySessionService
 {
     public bool IsGameplayActive { get; private set; }
 
-    public void StartGameplay()
+    public void Activate()
     {
         IsGameplayActive = true;
     }
 
-    public void StopGameplay()
+    public void Deactivate()
     {
         IsGameplayActive = false;
-    }
-
-    public void SetGameplayActive(bool isActive)
-    {
-        IsGameplayActive = isActive;
     }
 }

@@ -4,7 +4,7 @@ using Zenject;
 public class GameUIService : IInitializable, IDisposable
 {
     private readonly MainMenuWindow _mainMenuWindow;
-    private readonly PopupService _popupService;
+    private readonly GamePopupService _gamePopupService;
     private readonly GameHUDView _gameHudView;
     private readonly AuthFlowService _authFlowService;
     private readonly IAdsService _adsService;
@@ -14,7 +14,7 @@ public class GameUIService : IInitializable, IDisposable
 
     public GameUIService(
         MainMenuWindow mainMenuWindow,
-        PopupService popupService,
+        GamePopupService gamePopupService,
         GameHUDView gameHudView,
         AuthFlowService authFlowService,
         IAdsService adsService,
@@ -23,7 +23,7 @@ public class GameUIService : IInitializable, IDisposable
         PlayerScoreSystem playerScoreSystem)
     {
         _mainMenuWindow = mainMenuWindow;
-        _popupService = popupService;
+        _gamePopupService = gamePopupService;
         _gameHudView = gameHudView;
         _authFlowService = authFlowService;
         _adsService = adsService;
@@ -57,12 +57,18 @@ public class GameUIService : IInitializable, IDisposable
             return;
         }
 
+        HandlePlayerDefeat();
+    }
+
+    private void HandlePlayerDefeat()
+    {
         if (_gameFlowSystem.CurrentState == EGameLoopState.Defeat)
         {
             return;
         }
 
-        DefeatPopup defeatPopup = _popupService.ShowDefeatPopup();
+        DefeatPopup defeatPopup = _gamePopupService.ShowDefeatPopup();
+
         defeatPopup.SetScore(_playerScoreSystem.CurrentScore);
         defeatPopup.SetWatchAdButtonState(_adsService.IsRewardedAdReady);
 
@@ -79,13 +85,13 @@ public class GameUIService : IInitializable, IDisposable
                     _mainMenuWindow.Show();
                 }
 
-                _popupService.HideDefeatPopup();
+                _gamePopupService.HideDefeatPopup();
                 _gameHudView.Hide();
                 break;
 
             case EGameLoopState.Playing:
                 _mainMenuWindow.Hide();
-                _popupService.HideDefeatPopup();
+                _gamePopupService.HideDefeatPopup();
                 _gameHudView.Show();
                 break;
 

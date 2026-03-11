@@ -14,16 +14,18 @@ public class PlayerJumpState : IPlayerState
     public void Enter()
     {
         _context.PlayerAnimatorView.TriggerJump();
-        _context.PlayerView.JumpCompleted += OnJumpCompleted;
-        _context.PlayerView.DoJump();
+        _context.PlayerMovementSystem.JumpCompleted += OnJumpCompleted;
+        _context.PlayerMovementSystem.DoJump();
     }
 
     public void Exit()
     {
-        _context.PlayerView.JumpCompleted -= OnJumpCompleted;
+        _context.PlayerMovementSystem.JumpCompleted -= OnJumpCompleted;
     }
 
-    public void Tick() { }
+    public void Tick()
+    {
+    }
 
     private void OnJumpCompleted()
     {

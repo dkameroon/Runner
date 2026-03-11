@@ -1,12 +1,18 @@
 using System;
+using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 public class LeaderboardSubmitService : IInitializable, IDisposable
 {
+    private const string DefaultUserLogin = "Player";
+
     private readonly ILeaderboardService _leaderboardService;
     private readonly IAuthenticationService _authenticationService;
     private readonly PlayerScoreSystem _playerScoreSystem;
     private readonly PlayerStateMachineSystem _playerStateMachineSystem;
+
+    private bool _isSubmitting;
 
     public LeaderboardSubmitService(
         ILeaderboardService leaderboardService,
@@ -23,6 +29,7 @@ public class LeaderboardSubmitService : IInitializable, IDisposable
     public void Initialize()
     {
         _playerStateMachineSystem.StateChanged += OnPlayerStateChanged;
+        _isSubmitting = false;
     }
 
     public void Dispose()
@@ -30,9 +37,19 @@ public class LeaderboardSubmitService : IInitializable, IDisposable
         _playerStateMachineSystem.StateChanged -= OnPlayerStateChanged;
     }
 
-    private async void OnPlayerStateChanged(EPlayerState state)
+    private void OnPlayerStateChanged(EPlayerState state)
     {
         if (state != EPlayerState.Dead)
+        {
+            return;
+        }
+
+        _ = HandlePlayerDeadAsync();
+    }
+
+    private async Task HandlePlayerDeadAsync()
+    {
+        if (_isSubmitting)
         {
             return;
         }
@@ -47,10 +64,6 @@ public class LeaderboardSubmitService : IInitializable, IDisposable
             return;
         }
 
-        string userLogin = string.IsNullOrWhiteSpace(_authenticationService.UserLogin)
-            ? "Player"
-            : _authenticationService.UserLogin;
-
         int score = _playerScoreSystem.CurrentScore;
 
         if (score <= 0)
@@ -58,9 +71,31 @@ public class LeaderboardSubmitService : IInitializable, IDisposable
             return;
         }
 
-        await _leaderboardService.SubmitScoreAsync(
-            _authenticationService.UserId,
-            userLogin,
-            score);
+        string userLogin = string.IsNullOrWhiteSpace(_authenticationService.UserLogin)
+            ? DefaultUserLogin
+            : _authenticationService.UserLogin;
+
+        _isSubmitting = true;
+
+        try
+        {
+            LeaderboardSubmitResultData result = await _leaderboardService.SubmitScoreAsync(
+                _authenticationService.UserId,
+                userLogin,
+                score);
+
+            if (result.IsSuccess == false)
+            {
+                Debug.LogWarning($"Leaderboard submit failed: {result.ErrorMessage}");
+            }
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
     }
 }

@@ -1,19 +1,19 @@
 public class PlayerStateContextModel
 {
     public PlayerStateContextModel(
-        PlayerView playerView,
+        PlayerMovementSystem playerMovementSystem,
         PlayerAnimatorView playerAnimatorView,
         PlayerHitboxView playerHitboxView,
         RunnerGameConfig runnerGameConfig)
     {
-        PlayerView = playerView;
+        PlayerMovementSystem = playerMovementSystem;
         PlayerAnimatorView = playerAnimatorView;
         PlayerHitboxView = playerHitboxView;
         RunnerGameConfig = runnerGameConfig;
     }
 
-    public PlayerView PlayerView { get; }
+    public PlayerMovementSystem PlayerMovementSystem { get; }
     public PlayerAnimatorView PlayerAnimatorView { get; }
-    public RunnerGameConfig RunnerGameConfig { get; }
     public PlayerHitboxView PlayerHitboxView { get; }
+    public RunnerGameConfig RunnerGameConfig { get; }
 }

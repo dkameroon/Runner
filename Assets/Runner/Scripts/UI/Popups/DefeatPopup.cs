@@ -2,7 +2,6 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 public class DefeatPopup : MonoBehaviour
 {
@@ -11,31 +10,21 @@ public class DefeatPopup : MonoBehaviour
     [SerializeField] private Button _watchAdButton;
     [SerializeField] private TextMeshProUGUI _scoreValueText;
 
-    private PlayerRespawnSystem _playerRespawnSystem;
-    private GameFlowSystem _gameFlowSystem;
-
+    public event Action RestartClicked;
+    public event Action MainMenuClicked;
     public event Action WatchAdClicked;
-
-    [Inject]
-    public void Construct(
-        PlayerRespawnSystem playerRespawnSystem,
-        GameFlowSystem gameFlowSystem)
-    {
-        _playerRespawnSystem = playerRespawnSystem;
-        _gameFlowSystem = gameFlowSystem;
-    }
 
     private void OnEnable()
     {
         _restartButton.onClick.AddListener(OnRestartClicked);
-        _mainMenuButton.onClick.AddListener(OnExitClicked);
+        _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
         _watchAdButton.onClick.AddListener(OnWatchAdButtonClicked);
     }
 
     private void OnDisable()
     {
         _restartButton.onClick.RemoveListener(OnRestartClicked);
-        _mainMenuButton.onClick.RemoveListener(OnExitClicked);
+        _mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
         _watchAdButton.onClick.RemoveListener(OnWatchAdButtonClicked);
     }
 
@@ -61,14 +50,12 @@ public class DefeatPopup : MonoBehaviour
 
     private void OnRestartClicked()
     {
-        _playerRespawnSystem.Respawn();
-        _gameFlowSystem.StartGame();
+        RestartClicked?.Invoke();
     }
 
-    private void OnExitClicked()
+    private void OnMainMenuClicked()
     {
-        _playerRespawnSystem.Respawn();
-        _gameFlowSystem.EnterMainMenu();
+        MainMenuClicked?.Invoke();
     }
 
     private void OnWatchAdButtonClicked()

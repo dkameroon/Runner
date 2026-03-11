@@ -1,60 +1,69 @@
 using System;
+using System.Threading.Tasks;
 using Zenject;
 
-public class DefeatContinueFlowService : IInitializable, ITickable, IDisposable
+public class DefeatContinueFlowService : IInitializable, IDisposable
 {
-    private readonly PopupService _popupService;
+    private readonly GamePopupService _gamePopupService;
     private readonly IAdsService _adsService;
-    private readonly PlayerRespawnSystem _playerRespawnSystem;
+    private readonly PlayerContinueService _playerContinueService;
     private readonly GameFlowSystem _gameFlowSystem;
+    private readonly PlayerRespawnSystem _playerRespawnSystem;
 
     private DefeatPopup _subscribedPopup;
     private bool _isShowingRewardedAd;
 
     public DefeatContinueFlowService(
-        PopupService popupService,
+        GamePopupService gamePopupService,
         IAdsService adsService,
-        PlayerRespawnSystem playerRespawnSystem,
-        GameFlowSystem gameFlowSystem)
+        PlayerContinueService playerContinueService,
+        GameFlowSystem gameFlowSystem,
+        PlayerRespawnSystem playerRespawnSystem)
     {
-        _popupService = popupService;
+        _gamePopupService = gamePopupService;
         _adsService = adsService;
-        _playerRespawnSystem = playerRespawnSystem;
+        _playerContinueService = playerContinueService;
         _gameFlowSystem = gameFlowSystem;
+        _playerRespawnSystem = playerRespawnSystem;
     }
 
     public void Initialize()
     {
-    }
-
-    public void Tick()
-    {
-        TrySubscribeToPopup();
+        _gamePopupService.DefeatPopupShown += OnDefeatPopupShown;
+        _gamePopupService.DefeatPopupHidden += OnDefeatPopupHidden;
     }
 
     public void Dispose()
     {
+        _gamePopupService.DefeatPopupShown -= OnDefeatPopupShown;
+        _gamePopupService.DefeatPopupHidden -= OnDefeatPopupHidden;
+
         UnsubscribeFromPopup();
     }
 
-    private void TrySubscribeToPopup()
+    private void OnDefeatPopupShown(DefeatPopup defeatPopup)
     {
-        DefeatPopup currentPopup = _popupService.CurrentDefeatPopup;
-
-        if (currentPopup == null)
+        if (defeatPopup == null)
         {
             return;
         }
 
-        if (_subscribedPopup == currentPopup)
+        if (_subscribedPopup == defeatPopup)
         {
             return;
         }
 
         UnsubscribeFromPopup();
 
-        _subscribedPopup = currentPopup;
+        _subscribedPopup = defeatPopup;
+        _subscribedPopup.RestartClicked += OnRestartClicked;
+        _subscribedPopup.MainMenuClicked += OnMainMenuClicked;
         _subscribedPopup.WatchAdClicked += OnWatchAdClicked;
+    }
+
+    private void OnDefeatPopupHidden()
+    {
+        UnsubscribeFromPopup();
     }
 
     private void UnsubscribeFromPopup()
@@ -64,11 +73,30 @@ public class DefeatContinueFlowService : IInitializable, ITickable, IDisposable
             return;
         }
 
+        _subscribedPopup.RestartClicked -= OnRestartClicked;
+        _subscribedPopup.MainMenuClicked -= OnMainMenuClicked;
         _subscribedPopup.WatchAdClicked -= OnWatchAdClicked;
         _subscribedPopup = null;
     }
 
-    private async void OnWatchAdClicked()
+    private void OnRestartClicked()
+    {
+        _playerRespawnSystem.Respawn();
+        _gameFlowSystem.StartGame();
+    }
+
+    private void OnMainMenuClicked()
+    {
+        _playerRespawnSystem.Respawn();
+        _gameFlowSystem.EnterMainMenu();
+    }
+
+    private void OnWatchAdClicked()
+    {
+        _ = HandleWatchAdAsync();
+    }
+
+    private async Task HandleWatchAdAsync()
     {
         if (_isShowingRewardedAd)
         {
@@ -77,22 +105,51 @@ public class DefeatContinueFlowService : IInitializable, ITickable, IDisposable
 
         if (_adsService.IsRewardedAdReady == false)
         {
+            if (_subscribedPopup != null)
+            {
+                _subscribedPopup.SetWatchAdButtonState(false);
+            }
+
             return;
         }
 
         _isShowingRewardedAd = true;
 
-        RewardedAdResultData result = await _adsService.ShowRewardedAdAsync();
-
-        _isShowingRewardedAd = false;
-
-        if (result.IsSuccess == false || result.IsRewardGranted == false)
+        if (_subscribedPopup != null)
         {
-            return;
+            _subscribedPopup.SetWatchAdButtonState(false);
         }
 
-        _popupService.HideDefeatPopup();
-        _playerRespawnSystem.ContinueAfterDefeat();
-        _gameFlowSystem.ResumeGameAfterContinue();
+        try
+        {
+            RewardedAdResultData result = await _adsService.ShowRewardedAdAsync();
+
+            if (result.IsSuccess == false || result.IsRewardGranted == false)
+            {
+                if (_subscribedPopup != null)
+                {
+                    _subscribedPopup.SetWatchAdButtonState(_adsService.IsRewardedAdReady);
+                }
+
+                return;
+            }
+
+            _gamePopupService.HideDefeatPopup();
+            _playerContinueService.ContinueAfterDefeat();
+            _gameFlowSystem.ResumeGameAfterContinue();
+        }
+        catch (Exception exception)
+        {
+            UnityEngine.Debug.LogException(exception);
+
+            if (_subscribedPopup != null)
+            {
+                _subscribedPopup.SetWatchAdButtonState(_adsService.IsRewardedAdReady);
+            }
+        }
+        finally
+        {
+            _isShowingRewardedAd = false;
+        }
     }
 }

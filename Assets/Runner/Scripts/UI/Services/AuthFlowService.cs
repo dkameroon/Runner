@@ -1,31 +1,37 @@
 using System;
+using System.Threading.Tasks;
 using Zenject;
 
 public class AuthFlowService : IInitializable, IDisposable
 {
-    private const int MinPasswordLength = 6;
-
     private readonly AuthWindow _authWindow;
     private readonly MainMenuWindow _mainMenuWindow;
     private readonly IAuthenticationService _authenticationService;
+    private readonly AuthInputValidationService _authInputValidationService;
+
+    private bool _isRequestInProgress;
 
     public bool IsAuthScreenActive { get; private set; }
 
     public AuthFlowService(
         AuthWindow authWindow,
         MainMenuWindow mainMenuWindow,
-        IAuthenticationService authenticationService)
+        IAuthenticationService authenticationService,
+        AuthInputValidationService authInputValidationService)
     {
         _authWindow = authWindow;
         _mainMenuWindow = mainMenuWindow;
         _authenticationService = authenticationService;
+        _authInputValidationService = authInputValidationService;
     }
 
     public void Initialize()
     {
         _authWindow.SignInRequested += OnSignInRequested;
         _authWindow.SignUpRequested += OnSignUpRequested;
+
         IsAuthScreenActive = false;
+        _isRequestInProgress = false;
     }
 
     public void Dispose()
@@ -41,132 +47,110 @@ public class AuthFlowService : IInitializable, IDisposable
         _authWindow.Show();
     }
 
+    public void ShowMainMenu()
+    {
+        IsAuthScreenActive = false;
+        _authWindow.Hide();
+        _mainMenuWindow.Show();
+    }
+
     public void HideAuthScreen()
     {
         IsAuthScreenActive = false;
         _authWindow.Hide();
     }
 
-    private async void OnSignInRequested(string email, string password)
+    private void OnSignInRequested(string email, string password)
     {
-        if (TryValidateSignIn(email, password, out string errorMessage) == false)
+        _ = HandleSignInAsync(email, password);
+    }
+
+    private void OnSignUpRequested(string email, string login, string password, string confirmPassword)
+    {
+        _ = HandleSignUpAsync(email, login, password, confirmPassword);
+    }
+
+    private async Task HandleSignInAsync(string email, string password)
+    {
+        if (_isRequestInProgress)
+        {
+            return;
+        }
+
+        if (_authInputValidationService.TryValidateSignIn(email, password, out string errorMessage) == false)
         {
             _authWindow.SetError(errorMessage);
             return;
         }
 
-        AuthOperationResultData result = await _authenticationService.SignInAsync(email, password);
+        _isRequestInProgress = true;
 
-        if (result.IsSuccess == false)
+        try
         {
-            _authWindow.SetError(result.ErrorMessage);
+            AuthOperationResultData result = await _authenticationService.SignInAsync(email, password);
+
+            if (result.IsSuccess == false)
+            {
+                _authWindow.SetError(result.ErrorMessage);
+                return;
+            }
+
+            ShowMainMenu();
+        }
+        catch (Exception exception)
+        {
+            UnityEngine.Debug.LogException(exception);
+            _authWindow.SetError("Unexpected sign-in error.");
+        }
+        finally
+        {
+            _isRequestInProgress = false;
+        }
+    }
+
+    private async Task HandleSignUpAsync(string email, string login, string password, string confirmPassword)
+    {
+        if (_isRequestInProgress)
+        {
             return;
         }
 
-        HideAuthScreen();
-        _mainMenuWindow.Show();
-    }
-
-    private async void OnSignUpRequested(string email, string login, string password, string confirmPassword)
-    {
-        if (TryValidateSignUp(email, login, password, confirmPassword, out string errorMessage) == false)
+        if (_authInputValidationService.TryValidateSignUp(
+                email,
+                login,
+                password,
+                confirmPassword,
+                out string errorMessage) == false)
         {
             _authWindow.SetError(errorMessage);
             return;
         }
 
-        AuthOperationResultData result = await _authenticationService.SignUpAsync(email, login, password, confirmPassword);
+        _isRequestInProgress = true;
 
-        if (result.IsSuccess == false)
+        try
         {
-            _authWindow.SetError(result.ErrorMessage);
-            return;
+            AuthOperationResultData result = await _authenticationService.SignUpAsync(
+                email,
+                login,
+                password);
+
+            if (result.IsSuccess == false)
+            {
+                _authWindow.SetError(result.ErrorMessage);
+                return;
+            }
+
+            ShowMainMenu();
         }
-
-        HideAuthScreen();
-        _mainMenuWindow.Show();
-    }
-
-    private bool TryValidateSignIn(string email, string password, out string errorMessage)
-    {
-        if (string.IsNullOrWhiteSpace(email))
+        catch (Exception exception)
         {
-            errorMessage = "Email is required.";
-            return false;
+            UnityEngine.Debug.LogException(exception);
+            _authWindow.SetError("Unexpected sign-up error.");
         }
-
-        if (email.Contains("@") == false)
+        finally
         {
-            errorMessage = "Email is invalid.";
-            return false;
+            _isRequestInProgress = false;
         }
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            errorMessage = "Password is required.";
-            return false;
-        }
-
-        if (password.Length < MinPasswordLength)
-        {
-            errorMessage = $"Password must be at least {MinPasswordLength} characters.";
-            return false;
-        }
-
-        errorMessage = string.Empty;
-        return true;
-    }
-
-    private bool TryValidateSignUp(
-        string email,
-        string login,
-        string password,
-        string confirmPassword,
-        out string errorMessage)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            errorMessage = "Email is required.";
-            return false;
-        }
-
-        if (email.Contains("@") == false)
-        {
-            errorMessage = "Email is invalid.";
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(login))
-        {
-            errorMessage = "Login is required.";
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            errorMessage = "Password is required.";
-            return false;
-        }
-
-        if (password.Length < MinPasswordLength)
-        {
-            errorMessage = $"Password must be at least {MinPasswordLength} characters.";
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(confirmPassword))
-        {
-            errorMessage = "Confirm password is required.";
-            return false;
-        }
-
-        if (password != confirmPassword)
-        {
-            errorMessage = "Passwords do not match.";
-            return false;
-        }
-
-        errorMessage = string.Empty;
-        return true;
     }
 }

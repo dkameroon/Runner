@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 public class MainMenuFlowService : IInitializable, IDisposable
@@ -6,6 +8,8 @@ public class MainMenuFlowService : IInitializable, IDisposable
     private readonly MainMenuWindow _mainMenuWindow;
     private readonly AuthFlowService _authFlowService;
     private readonly IAuthenticationService _authenticationService;
+
+    private bool _isLogoutInProgress;
 
     public MainMenuFlowService(
         MainMenuWindow mainMenuWindow,
@@ -20,6 +24,7 @@ public class MainMenuFlowService : IInitializable, IDisposable
     public void Initialize()
     {
         _mainMenuWindow.LogoutClicked += OnLogoutClicked;
+        _isLogoutInProgress = false;
     }
 
     public void Dispose()
@@ -27,16 +32,39 @@ public class MainMenuFlowService : IInitializable, IDisposable
         _mainMenuWindow.LogoutClicked -= OnLogoutClicked;
     }
 
-    private async void OnLogoutClicked()
+    private void OnLogoutClicked()
     {
-        AuthOperationResultData result = await _authenticationService.SignOutAsync();
+        _ = HandleLogoutAsync();
+    }
 
-        if (result.IsSuccess == false)
+    private async Task HandleLogoutAsync()
+    {
+        if (_isLogoutInProgress)
         {
             return;
         }
 
-        _mainMenuWindow.Hide();
-        _authFlowService.ShowAuthScreen();
+        _isLogoutInProgress = true;
+
+        try
+        {
+            AuthOperationResultData result = await _authenticationService.SignOutAsync();
+
+            if (result.IsSuccess == false)
+            {
+                Debug.LogWarning($"Sign out failed: {result.ErrorMessage}");
+                return;
+            }
+
+            _authFlowService.ShowAuthScreen();
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+        finally
+        {
+            _isLogoutInProgress = false;
+        }
     }
 }

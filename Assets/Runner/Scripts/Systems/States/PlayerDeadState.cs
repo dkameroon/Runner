@@ -13,9 +13,14 @@ public class PlayerDeadState : IPlayerState
     {
         _context.PlayerAnimatorView.SetRunning(false);
         _context.PlayerAnimatorView.SetDead(true);
-        _context.PlayerView.SetMovementEnabled(false);
+        _context.PlayerMovementSystem.SetMovementEnabled(false);
     }
 
-    public void Exit() { }
-    public void Tick() { }
+    public void Exit()
+    {
+    }
+
+    public void Tick()
+    {
+    }
 }

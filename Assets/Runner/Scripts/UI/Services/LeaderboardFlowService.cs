@@ -1,39 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Zenject;
 
 public class LeaderboardFlowService : IInitializable, IDisposable
 {
+    private const int TopEntriesCount = 20;
+
     private readonly MainMenuWindow _mainMenuWindow;
     private readonly LeaderboardWindow _leaderboardWindow;
     private readonly ILeaderboardService _leaderboardService;
-    private readonly LeaderboardEntryElement _leaderboardEntryElementPrefab;
-    private readonly DiContainer _diContainer;
-    private readonly IAuthenticationService _authenticationService;
-    private readonly PlayerScoreSystem _playerScoreSystem;
+    private readonly LeaderboardEntryElementFactory _leaderboardEntryElementFactory;
+    private readonly LeaderboardPlayerBestScoreProvider _leaderboardPlayerBestScoreProvider;
+
+    private bool _isLoadingLeaderboard;
 
     public LeaderboardFlowService(
         MainMenuWindow mainMenuWindow,
         LeaderboardWindow leaderboardWindow,
         ILeaderboardService leaderboardService,
-        IAuthenticationService authenticationService,
-        PlayerScoreSystem playerScoreSystem,
-        LeaderboardEntryElement leaderboardEntryElementPrefab,
-        DiContainer diContainer)
+        LeaderboardEntryElementFactory leaderboardEntryElementFactory,
+        LeaderboardPlayerBestScoreProvider leaderboardPlayerBestScoreProvider)
     {
         _mainMenuWindow = mainMenuWindow;
         _leaderboardWindow = leaderboardWindow;
         _leaderboardService = leaderboardService;
-        _leaderboardEntryElementPrefab = leaderboardEntryElementPrefab;
-        _diContainer = diContainer;
-        _authenticationService = authenticationService;
-        _playerScoreSystem = playerScoreSystem;
+        _leaderboardEntryElementFactory = leaderboardEntryElementFactory;
+        _leaderboardPlayerBestScoreProvider = leaderboardPlayerBestScoreProvider;
     }
 
     public void Initialize()
     {
         _mainMenuWindow.LeaderboardClicked += OnLeaderboardClicked;
         _leaderboardWindow.ReturnToMenuClicked += OnReturnToMenuClicked;
+        _isLoadingLeaderboard = false;
     }
 
     public void Dispose()
@@ -42,48 +42,61 @@ public class LeaderboardFlowService : IInitializable, IDisposable
         _leaderboardWindow.ReturnToMenuClicked -= OnReturnToMenuClicked;
     }
 
-    private async void OnLeaderboardClicked()
+    private void OnLeaderboardClicked()
     {
-        _mainMenuWindow.Hide();
-
-        IReadOnlyList<LeaderboardEntryData> entries = await _leaderboardService.LoadTopEntriesAsync(20);
-
-        _leaderboardWindow.ClearEntries();
-
-        for (int i = 0; i < entries.Count; i++)
-        {
-            LeaderboardEntryElement entryElement =
-                _diContainer.InstantiatePrefabForComponent<LeaderboardEntryElement>(
-                    _leaderboardEntryElementPrefab);
-
-            entryElement.SetData(entries[i]);
-            _leaderboardWindow.AddEntry(entryElement);
-        }
-
-        string playerLogin = string.IsNullOrWhiteSpace(_authenticationService.UserLogin)
-            ? "Player"
-            : _authenticationService.UserLogin;
-
-        int playerBestScore = 0;
-
-        for (int i = 0; i < entries.Count; i++)
-        {
-            if (entries[i].UserId != _authenticationService.UserId)
-            {
-                continue;
-            }
-
-            playerBestScore = entries[i].Score;
-            break;
-        }
-
-        _leaderboardWindow.SetPlayerBestScore(playerLogin, playerBestScore);
-        _leaderboardWindow.Show();
+        _ = ShowLeaderboardAsync();
     }
 
     private void OnReturnToMenuClicked()
     {
         _leaderboardWindow.Hide();
         _mainMenuWindow.Show();
+    }
+
+    private async Task ShowLeaderboardAsync()
+    {
+        if (_isLoadingLeaderboard)
+        {
+            return;
+        }
+
+        _isLoadingLeaderboard = true;
+
+        try
+        {
+            _mainMenuWindow.Hide();
+
+            IReadOnlyList<LeaderboardEntryData> entries =
+                await _leaderboardService.LoadTopEntriesAsync(TopEntriesCount);
+
+            RebuildEntries(entries);
+
+            string playerLogin = _leaderboardPlayerBestScoreProvider.GetPlayerLogin();
+            int playerBestScore = _leaderboardPlayerBestScoreProvider.GetPlayerBestScore(entries);
+
+            _leaderboardWindow.SetPlayerBestScore(playerLogin, playerBestScore);
+            _leaderboardWindow.Show();
+        }
+        catch (Exception exception)
+        {
+            UnityEngine.Debug.LogException(exception);
+            _mainMenuWindow.Show();
+        }
+        finally
+        {
+            _isLoadingLeaderboard = false;
+        }
+    }
+
+    private void RebuildEntries(IReadOnlyList<LeaderboardEntryData> entries)
+    {
+        _leaderboardWindow.ClearEntries();
+
+        for (int index = 0; index < entries.Count; index++)
+        {
+            LeaderboardEntryElement entryElement = _leaderboardEntryElementFactory.Create();
+            entryElement.SetData(entries[index]);
+            _leaderboardWindow.AddEntry(entryElement);
+        }
     }
 }

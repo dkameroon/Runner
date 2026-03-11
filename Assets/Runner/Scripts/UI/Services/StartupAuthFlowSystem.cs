@@ -1,38 +1,71 @@
+using System;
 using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 public class StartupAuthFlowSystem : IInitializable
 {
     private readonly AuthFlowService _authFlowService;
-    private readonly MainMenuWindow _mainMenuWindow;
     private readonly IAuthenticationService _authenticationService;
+
+    private bool _isInitializationRunning;
+    private bool _isInitialized;
 
     public StartupAuthFlowSystem(
         AuthFlowService authFlowService,
-        MainMenuWindow mainMenuWindow,
         IAuthenticationService authenticationService)
     {
         _authFlowService = authFlowService;
-        _mainMenuWindow = mainMenuWindow;
         _authenticationService = authenticationService;
     }
 
     public void Initialize()
     {
+        StartInitialization();
+    }
+
+    private void StartInitialization()
+    {
+        if (_isInitializationRunning || _isInitialized)
+        {
+            return;
+        }
+
         _ = InitializeAsync();
     }
 
     private async Task InitializeAsync()
     {
-        await _authenticationService.InitializeAsync();
-
-        if (_authenticationService.IsAuthorized)
+        if (_isInitializationRunning || _isInitialized)
         {
-            _authFlowService.HideAuthScreen();
-            _mainMenuWindow.Show();
             return;
         }
 
-        _authFlowService.ShowAuthScreen();
+        _isInitializationRunning = true;
+
+        try
+        {
+            await _authenticationService.InitializeAsync();
+
+            if (_authenticationService.IsAuthorized)
+            {
+                _authFlowService.ShowMainMenu();
+            }
+            else
+            {
+                _authFlowService.ShowAuthScreen();
+            }
+
+            _isInitialized = true;
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            _authFlowService.ShowAuthScreen();
+        }
+        finally
+        {
+            _isInitializationRunning = false;
+        }
     }
 }

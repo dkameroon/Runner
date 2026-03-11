@@ -11,10 +11,15 @@ public class PlayerIdleState : IPlayerState
 
     public void Enter()
     {
-        _context.PlayerView.SetMovementEnabled(false);
+        _context.PlayerMovementSystem.SetMovementEnabled(false);
         _context.PlayerAnimatorView.SetRunning(false);
     }
 
-    public void Exit() { }
-    public void Tick() { }
+    public void Exit()
+    {
+    }
+
+    public void Tick()
+    {
+    }
 }

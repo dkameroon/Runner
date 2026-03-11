@@ -10,6 +10,6 @@ public interface IAuthenticationService
     Task InitializeAsync();
     Task<bool> TrySilentSignInAsync();
     Task<AuthOperationResultData> SignInAsync(string email, string password);
-    Task<AuthOperationResultData> SignUpAsync(string email, string login, string password, string confirmPassword);
+    Task<AuthOperationResultData> SignUpAsync(string email, string login, string password);
     Task<AuthOperationResultData> SignOutAsync();
 }
