@@ -8,17 +8,20 @@ public class DefeatPopup : MonoBehaviour
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _mainMenuButton;
     [SerializeField] private Button _watchAdButton;
+    [SerializeField] private Button _settingsButton;
     [SerializeField] private TextMeshProUGUI _scoreValueText;
 
     public event Action RestartClicked;
     public event Action MainMenuClicked;
     public event Action WatchAdClicked;
+    public event Action SettingsClicked;
 
     private void OnEnable()
     {
         _restartButton.onClick.AddListener(OnRestartClicked);
         _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
         _watchAdButton.onClick.AddListener(OnWatchAdButtonClicked);
+        _settingsButton.onClick.AddListener(OnSettingsClicked);
     }
 
     private void OnDisable()
@@ -26,6 +29,7 @@ public class DefeatPopup : MonoBehaviour
         _restartButton.onClick.RemoveListener(OnRestartClicked);
         _mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
         _watchAdButton.onClick.RemoveListener(OnWatchAdButtonClicked);
+        _settingsButton.onClick.RemoveListener(OnSettingsClicked);
     }
 
     public void Show()
@@ -61,5 +65,10 @@ public class DefeatPopup : MonoBehaviour
     private void OnWatchAdButtonClicked()
     {
         WatchAdClicked?.Invoke();
+    }
+
+    private void OnSettingsClicked()
+    {
+        SettingsClicked?.Invoke();
     }
 }

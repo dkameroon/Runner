@@ -10,6 +10,7 @@ public class GameSceneInstaller : MonoInstaller
     [SerializeField] private WorldGenerationConfig _worldGenerationConfig;
     [SerializeField] private DebugOverlayConfig _debugOverlayConfig;
     [SerializeField] private ObstacleDifficultyConfig _obstacleDifficultyConfig;
+    [SerializeField] private AudioConfig _audioConfig;
 
     [Header("Debug Overlay")]
     [SerializeField] private DebugOverlayView _debugOverlayView;
@@ -21,9 +22,13 @@ public class GameSceneInstaller : MonoInstaller
     [SerializeField] private LeaderboardEntryElement _leaderboardEntryElementPrefab;
     [SerializeField] private DefeatPopup _defeatPopupPrefab;
     [SerializeField] private PausePopup _pausePopupPrefab;
+    [SerializeField] private SettingsPopup _settingsPopupPrefab;
     [SerializeField] private GameHUDView _gameHudView;
     [SerializeField] private PopupCanvasRootView _popupCanvasRootView;
     [SerializeField] private PauseButtonView _pauseButtonView;
+
+    [Header("Audio")]
+    [SerializeField] private AudioPlayerView _audioPlayerView;
 
     public override void InstallBindings()
     {
@@ -34,6 +39,7 @@ public class GameSceneInstaller : MonoInstaller
         BindFirebase();
         BindFactories();
         BindGameplay();
+        BindAudio();
         BindUI();
         BindDebug();
     }
@@ -46,6 +52,7 @@ public class GameSceneInstaller : MonoInstaller
         Container.BindInstance(_worldGenerationConfig).AsSingle();
         Container.BindInstance(_obstacleDifficultyConfig).AsSingle();
         Container.BindInstance(_debugOverlayConfig).AsSingle();
+        Container.BindInstance(_audioConfig).AsSingle();
     }
 
     private void BindSceneViews()
@@ -64,6 +71,7 @@ public class GameSceneInstaller : MonoInstaller
         Container.Bind<GameHUDView>().FromInstance(_gameHudView).AsSingle();
         Container.Bind<PopupCanvasRootView>().FromInstance(_popupCanvasRootView).AsSingle();
         Container.Bind<PauseButtonView>().FromInstance(_pauseButtonView).AsSingle();
+        Container.Bind<AudioPlayerView>().FromInstance(_audioPlayerView).AsSingle();
 
 #if UNITY_EDITOR
         Container.Bind<EditorDebugRestartInputView>().FromComponentInHierarchy().AsSingle().NonLazy();
@@ -117,6 +125,7 @@ public class GameSceneInstaller : MonoInstaller
     {
         Container.BindInstance(_defeatPopupPrefab).AsSingle();
         Container.BindInstance(_pausePopupPrefab).AsSingle();
+        Container.BindInstance(_settingsPopupPrefab).AsSingle();
         Container.BindInstance(_leaderboardEntryElementPrefab).AsSingle();
 
         Container.Bind<LeaderboardEntryElementFactory>().AsSingle();
@@ -143,6 +152,12 @@ public class GameSceneInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<GameFlowSystem>().AsSingle().NonLazy();
     }
 
+    private void BindAudio()
+    {
+        Container.Bind<AudioSettingsService>().AsSingle();
+        Container.BindInterfacesAndSelfTo<GameAudioService>().AsSingle().NonLazy();
+    }
+
     private void BindUI()
     {
         Container.Bind<AuthInputValidationService>().AsSingle();
@@ -157,6 +172,7 @@ public class GameSceneInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<LeaderboardFlowService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<DefeatContinueFlowService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PauseFlowService>().AsSingle().NonLazy();
+        Container.BindInterfacesAndSelfTo<SettingsFlowService>().AsSingle().NonLazy();
     }
 
     private void BindDebug()

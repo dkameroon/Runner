@@ -8,12 +8,14 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private Button _leaderboardButton;
     [SerializeField] private Button _logoutButton;
+    [SerializeField] private Button _settingsButton;
     [SerializeField] private Button _exitButton;
 
     private GameFlowSystem _gameFlowSystem;
 
     public event Action LogoutClicked;
     public event Action LeaderboardClicked;
+    public event Action SettingsClicked;
 
     [Inject]
     public void Construct(GameFlowSystem gameFlowSystem)
@@ -25,6 +27,7 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
     {
         _leaderboardButton.onClick.AddListener(OnLeaderboardClicked);
         _logoutButton.onClick.AddListener(OnLogoutClicked);
+        _settingsButton.onClick.AddListener(OnSettingsClicked);
         _exitButton.onClick.AddListener(OnExitClicked);
     }
 
@@ -32,6 +35,7 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
     {
         _leaderboardButton.onClick.RemoveListener(OnLeaderboardClicked);
         _logoutButton.onClick.RemoveListener(OnLogoutClicked);
+        _settingsButton.onClick.RemoveListener(OnSettingsClicked);
         _exitButton.onClick.RemoveListener(OnExitClicked);
     }
 
@@ -76,6 +80,11 @@ public class MainMenuWindow : MonoBehaviour, IPointerClickHandler
     private void OnLogoutClicked()
     {
         LogoutClicked?.Invoke();
+    }
+
+    private void OnSettingsClicked()
+    {
+        SettingsClicked?.Invoke();
     }
 
     private void OnExitClicked()

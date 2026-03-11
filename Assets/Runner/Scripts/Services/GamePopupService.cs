@@ -6,12 +6,15 @@ public class GamePopupService
 
     private DefeatPopup _defeatPopupInstance;
     private PausePopup _pausePopupInstance;
+    private SettingsPopup _settingsPopupInstance;
 
     private bool _isDefeatPopupVisible;
     private bool _isPausePopupVisible;
+    private bool _isSettingsPopupVisible;
 
     public DefeatPopup CurrentDefeatPopup => _defeatPopupInstance;
     public PausePopup CurrentPausePopup => _pausePopupInstance;
+    public SettingsPopup CurrentSettingsPopup => _settingsPopupInstance;
 
     public event Action<DefeatPopup> DefeatPopupShown;
     public event Action DefeatPopupHidden;
@@ -19,11 +22,15 @@ public class GamePopupService
     public event Action<PausePopup> PausePopupShown;
     public event Action PausePopupHidden;
 
+    public event Action<SettingsPopup> SettingsPopupShown;
+    public event Action SettingsPopupHidden;
+
     public GamePopupService(PopupFactory popupFactory)
     {
         _popupFactory = popupFactory;
         _isDefeatPopupVisible = false;
         _isPausePopupVisible = false;
+        _isSettingsPopupVisible = false;
     }
 
     public DefeatPopup ShowDefeatPopup()
@@ -96,6 +103,41 @@ public class GamePopupService
         PausePopupHidden?.Invoke();
     }
 
+    public SettingsPopup ShowSettingsPopup()
+    {
+        SettingsPopup settingsPopup = GetOrCreateSettingsPopup();
+
+        if (_isSettingsPopupVisible)
+        {
+            return settingsPopup;
+        }
+
+        settingsPopup.Show();
+        _isSettingsPopupVisible = true;
+
+        SettingsPopupShown?.Invoke(settingsPopup);
+
+        return settingsPopup;
+    }
+
+    public void HideSettingsPopup()
+    {
+        if (_settingsPopupInstance == null)
+        {
+            return;
+        }
+
+        if (_isSettingsPopupVisible == false)
+        {
+            return;
+        }
+
+        _settingsPopupInstance.Hide();
+        _isSettingsPopupVisible = false;
+
+        SettingsPopupHidden?.Invoke();
+    }
+
     private DefeatPopup GetOrCreateDefeatPopup()
     {
         if (_defeatPopupInstance != null)
@@ -120,5 +162,18 @@ public class GamePopupService
         _pausePopupInstance.Hide();
 
         return _pausePopupInstance;
+    }
+
+    private SettingsPopup GetOrCreateSettingsPopup()
+    {
+        if (_settingsPopupInstance != null)
+        {
+            return _settingsPopupInstance;
+        }
+
+        _settingsPopupInstance = _popupFactory.CreateSettingsPopup();
+        _settingsPopupInstance.Hide();
+
+        return _settingsPopupInstance;
     }
 }

@@ -8,17 +8,20 @@ public class PausePopup : MonoBehaviour
     [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _mainMenuButton;
+    [SerializeField] private Button _settingsButton;
     [SerializeField] private TextMeshProUGUI _titleText;
 
     public event Action ResumeClicked;
     public event Action RestartClicked;
     public event Action MainMenuClicked;
+    public event Action SettingsClicked;
 
     private void OnEnable()
     {
         _resumeButton.onClick.AddListener(OnResumeClicked);
         _restartButton.onClick.AddListener(OnRestartClicked);
         _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+        _settingsButton.onClick.AddListener(OnSettingsClicked);
     }
 
     private void OnDisable()
@@ -26,6 +29,7 @@ public class PausePopup : MonoBehaviour
         _resumeButton.onClick.RemoveListener(OnResumeClicked);
         _restartButton.onClick.RemoveListener(OnRestartClicked);
         _mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
+        _settingsButton.onClick.RemoveListener(OnSettingsClicked);
     }
 
     public void Show()
@@ -51,5 +55,10 @@ public class PausePopup : MonoBehaviour
     private void OnMainMenuClicked()
     {
         MainMenuClicked?.Invoke();
+    }
+
+    private void OnSettingsClicked()
+    {
+        SettingsClicked?.Invoke();
     }
 }

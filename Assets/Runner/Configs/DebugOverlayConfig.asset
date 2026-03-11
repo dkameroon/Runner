@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffb48ce760f8e5142bba724a40fc6794, type: 3}
   m_Name: DebugOverlayConfig
   m_EditorClassIdentifier: Assembly-CSharp::DebugOverlayConfig
-  <IsEnabled>k__BackingField: 1
+  <IsEnabled>k__BackingField: 0
   <RefreshInterval>k__BackingField: 0.25
   <ShowOnlyInDevelopmentBuild>k__BackingField: 0
